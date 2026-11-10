@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кухонная История</title>
+    <style>
+        :root {
+            --brand-red: #b71c1c;
+            --brand-dark: #333333;
+            --bg-color: #f4f4f4;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--brand-dark);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .calculator-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            border-top: 5px solid var(--brand-red);
+            border-bottom: 5px solid var(--brand-red);
+        }
+        
+        .header-section {
+            text-align: center;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .logo {
+            display: inline-block;
+            max-width: 300px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .red-divider {
+            height: 5px;
+            background-color: var(--brand-red);
+            border-radius: 12px 12px 0 0; 
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        /* Стили для переключателя Кухни/Шкафы */
+        .product-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .product-toggle button {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--brand-red);
+            background-color: white;
+            color: var(--brand-red);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .product-toggle button.active {
+            background-color: var(--brand-red);
+            color: white;
+        }
+
+        .info-box {
+            background-color: #f9f9f9;
+            border-left: 4px solid var(--brand-dark);
+            padding: 10px 15px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            color: #555;
+            line-height: 1.5;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: var(--brand-red);
+        }
+        
+        /* Панель настройки цен */
+        .admin-panel {
+            border: 2px dashed var(--brand-red);
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #fff9f9;
+            margin-bottom: 20px;
+        }
+        .admin-panel h3 {
+            margin-top: 0;
+            font-size: 14px;
+            color: var(--brand-red);
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .admin-group-title {
+            font-weight: bold;
+            font-size: 12px;
+            color: #666;
+            margin: 15px 0 5px 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 3px;
+        }
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .admin-grid label {
+            font-size: 11px;
+        }
+        .admin-grid input {
+            padding: 6px;
+            font-size: 14px;
+        }
+
+        .total-box {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: var(--brand-dark);
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .total-box span {
+            display: block;
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 5px;
+        }
+        .total-price {
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Блок с контактами менеджера */
+        .manager-info {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--brand-dark);
+            padding: 15px;
+            background-color: #fafafa;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+        .manager-info a {
+            color: var(--brand-red);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .manager-info a:hover {
+            text-decoration: underline;
+        }
+
+        /* Скрытие блоков */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator-container">
+    
+    <div class="header-section">
+        <img src="логотип.jpeg" alt="Кухонная История" class="logo">
+        <div class="red-divider"></div>
+    </div>
+
+    <!-- Переключатель категорий -->
+    <div class="product-toggle">
+        <button id="btn-kitchen" class="active" onclick="setProduct('kitchen')">Кухни</button>
+        <button id="btn-wardrobe" onclick="setProduct('wardrobe')">Шкафы</button>
+    </div>
+
+    <!-- ПАНЕЛЬ НАСТРОЙКИ ЦЕН (для тебя) -->
+    <div class="admin-panel">
+        <h3>⚙️ Настройка базовых цен</h3>
+        
+        <!-- Цены для Кухонь -->
+        <div class="admin-group-title">Кухни:</div>
+        <div class="admin-grid">
+            <div>
+                <label>1 м. Низа (₽)</label>
+                <input type="number" id="price-bottom" value="15000">
+            </div>
+            <div>
+                <label>1 м. Верха (₽)</label>
+                <input type="number" id="price-top" value="10000">
+            </div>
+            <div>
+                <label>1 Пенал (₽)</label>
+                <input type="number" id="price-penceal" value="25000">
+            </div>
+            <div>
+                <label>1 Ящик Blum (₽)</label>
+                <input type="number" id="price-drawer-blum" value="5000">
+            </div>
+            <div>
+                <label>1 Ящик Аналог (₽)</label>
+                <input type="number" id="price-drawer-analog" value="3000">
+            </div>
+            <div>
+                <label>Столешница ЛДСП (₽/м)</label>
+                <input type="number" id="price-countertop-ldsp" value="5000">
+            </div>
+            <div>
+                <label>Столешница Камень (₽/м)</label>
+                <input type="number" id="price-countertop-stone" value="15000">
+            </div>
+        </div>
+
+        <!-- Цены для Шкафов -->
+        <div class="admin-group-title">Шкафы:</div>
+        <div class="admin-grid">
+            <div>
+                <label>1 м. Прямого (₽)</label>
+                <input type="number" id="price-wardrobe-straight" value="20000">
+            </div>
+            <div>
+                <label>1 м. Углового (₽)</label>
+                <input type="number" id="price-wardrobe-corner" value="25000">
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= ФОРМА КУХНИ ================= -->
+    <div id="form-kitchen">
+        <div class="info-box">
+            <strong>Материал корпуса:</strong> ЛДСП Egger (премиум-класс)<br>
+            <strong>Петли:</strong> Blum с доводчиками
+        </div>
+
+        <div class="form-group">
+            <label>Форма кухни</label>
+            <select id="kitchen-form-type">
+                <option value="Прямая">Прямая</option>
+                <option value="Угловая">Угловая</option>
+                <option value="П-образная">П-образная</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Длина нижних шкафов (в метрах)</label>
+            <input type="number" id="len-bottom" value="3" min="0" step="0.1">
+        </div>
+
+        <div class="form-group">
+            <label>Длина верхних шкафов (в метрах)</label>
+            <input type="number" id="len-top" value="2" min="0" step="0.1">
+        </div>
+
+        <div class="form-group">
+            <label>Количество пеналов (высоких шкафов), шт.</label>
+            <input type="number" id="penceals" value="0" min="0" step="1">
+        </div>
+
+        <div class="form-group">
+            <label>Количество выдвижных ящиков, шт.</label>
+            <input type="number" id="drawers-count" value="0" min="0" step="1">
+        </div>
+
+        <div class="form-group">
+            <label>Тип выдвижных ящиков</label>
+            <select id="drawer-type">
+                <option value="blum">Ящики Blum</option>
+                <option value="analog">Ящики Аналог</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Столешница</label>
+            <select id="countertop-type">
+                <option value="none">Без столешницы</option>
+                <option value="ldsp">ЛДСП</option>
+                <option value="stone">Искусственный камень</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Материал фасадов</label>
+            <select id="material">
+                <option value="ldsp">ЛДСП (базовая)</option>
+                <option value="pvh">Пленка ПВХ</option>
+                <option value="plastic">Пластик</option>
+                <option value="painted">Крашеные фасады</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- ================= ФОРМА ШКАФОВ ================= -->
+    <div id="form-wardrobe" class="hidden">
+        <div class="info-box">
+            <strong>Материал корпуса:</strong> ЛДСП Egger (премиум-класс)<br>
+            <strong>Петли:</strong> Blum с доводчиками
+        </div>
+
+        <div class="form-group">
+            <label>Форма шкафа</label>
+            <select id="wardrobe-form-type">
+                <option value="straight">Прямой</option>
+                <option value="corner">Угловой</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Общая длина шкафа (в метрах)</label>
+            <input type="number" id="len-wardrobe" value="2" min="0" step="0.1">
+        </div>
+        
+        <div class="form-group">
+            <label>Материал фасадов</label>
+            <select id="wardrobe-material">
+                <option value="ldsp">ЛДСП (базовая)</option>
+                <option value="pvh">Пленка ПВХ</option>
+                <option value="plastic">Пластик</option>
+                <option value="painted">Крашеные фасады</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Итог -->
+    <div class="total-box">
+        <span>Примерная стоимость:</span>
+        <div class="total-price" id="total-price">0 ₽</div>
+    </div>
+
+    <!-- Контакты менеджера -->
+    <div class="manager-info">
+        Ваш менеджер: <strong>Иван</strong><br>
+        Телефон: <a href="tel:+79231334233">8-923-133-4233</a>
+    </div>
+
+</div>
+
+<script>
+    // Текущий выбранный продукт ('kitchen' или 'wardrobe')
+    let currentProduct = 'kitchen';
+
+    // Функция переключения вкладок
+    function setProduct(type) {
+        currentProduct = type;
+        
+        // Меняем активный класс у кнопок
+        document.getElementById('btn-kitchen').classList.remove('active');
+        document.getElementById('btn-wardrobe').classList.remove('active');
+        
+        // Показываем нужную форму и скрываем другую
+        if (type === 'kitchen') {
+            document.getElementById('btn-kitchen').classList.add('active');
+            document.getElementById('form-kitchen').classList.remove('hidden');
+            document.getElementById('form-wardrobe').classList.add('hidden');
+        } else {
+            document.getElementById('btn-wardrobe').classList.add('active');
+            document.getElementById('form-kitchen').classList.add('hidden');
+            document.getElementById('form-wardrobe').classList.remove('hidden');
+        }
+        
+        // Пересчитываем цену при переключении
+        calculate();
+    }
+
+    // Элементы формы (Кухни)
+    const lenBottomInput = document.getElementById('len-bottom');
+    const lenTopInput = document.getElementById('len-top');
+    const pencealsInput = document.getElementById('penceals');
+    const drawersCountInput = document.getElementById('drawers-count');
+    const drawerTypeSelect = document.getElementById('drawer-type');
+    const countertopTypeSelect = document.getElementById('countertop-type');
+    
+    // Элементы формы (Шкафы)
+    const wardrobeFormTypeSelect = document.getElementById('wardrobe-form-type');
+    const lenWardrobeInput = document.getElementById('len-wardrobe');
+
+    const totalPriceEl = document.getElementById('total-price');
+    
+    // Элементы цен (Кухни)
+    const priceBottomInput = document.getElementById('price-bottom');
+    const priceTopInput = document.getElementById('price-top');
+    const pricePencealInput = document.getElementById('price-penceal');
+    const priceDrawerBlumInput = document.getElementById('price-drawer-blum');
+    const priceDrawerAnalogInput = document.getElementById('price-drawer-analog');
+    const priceCountertopLdspInput = document.getElementById('price-countertop-ldsp');
+    const priceCountertopStoneInput = document.getElementById('price-countertop-stone');
+
+    // Элементы цен (Шкафы)
+    const priceWardrobeStraightInput = document.getElementById('price-wardrobe-straight');
+    const priceWardrobeCornerInput = document.getElementById('price-wardrobe-corner');
+
+    function calculate() {
+        let finalPrice = 0;
+
+        if (currentProduct === 'kitchen') {
+            // Цены из панели (Кухни)
+            let priceBottom = parseFloat(priceBottomInput.value) || 0;
+            let priceTop = parseFloat(priceTopInput.value) || 0;
+            let pricePenceal = parseFloat(pricePencealInput.value) || 0;
+            let priceBlum = parseFloat(priceDrawerBlumInput.value) || 0;
+            let priceAnalog = parseFloat(priceDrawerAnalogInput.value) || 0;
+            let priceCountertopLdsp = parseFloat(priceCountertopLdspInput.value) || 0;
+            let priceCountertopStone = parseFloat(priceCountertopStoneInput.value) || 0;
+
+            // Данные из формы (Кухни)
+            let lenBottom = parseFloat(lenBottomInput.value) || 0;
+            let lenTop = parseFloat(lenTopInput.value) || 0;
+            let penceals = parseInt(pencealsInput.value) || 0;
+            let drawersCount = parseInt(drawersCountInput.value) || 0;
+            let drawerType = drawerTypeSelect.value;
+            let countertopType = countertopTypeSelect.value;
+
+            // Считаем позиции
+            let costBottom = lenBottom * priceBottom;
+            let costTop = lenTop * priceTop;
+            let costPenceal = penceals * pricePenceal;
+            
+            // Считаем ящики
+            let costDrawers = 0;
+            if (drawerType === 'blum') {
+                costDrawers = drawersCount * priceBlum;
+            } else {
+                costDrawers = drawersCount * priceAnalog;
+            }
+
+            // Считаем столешницу
+            let costCountertop = 0;
+            if (countertopType === 'ldsp') {
+                costCountertop = lenBottom * priceCountertopLdsp;
+            } else if (countertopType === 'stone') {
+                costCountertop = lenBottom * priceCountertopStone;
+            }
+
+            finalPrice = costBottom + costTop + costPenceal + costDrawers + costCountertop;
+            
+        } else {
+            // Логика для ШКАФОВ
+            let priceWardrobeStraight = parseFloat(priceWardrobeStraightInput.value) || 0;
+            let priceWardrobeCorner = parseFloat(priceWardrobeCornerInput.value) || 0;
+            
+            let lenWardrobe = parseFloat(lenWardrobeInput.value) || 0;
+            let wardrobeType = wardrobeFormTypeSelect.value;
+            
+            let pricePerMeter = (wardrobeType === 'straight') ? priceWardrobeStraight : priceWardrobeCorner;
+            
+            finalPrice = lenWardrobe * pricePerMeter;
+        }
+
+        // Выводим итог
+        totalPriceEl.innerText = new Intl.NumberFormat('ru-RU').format(Math.round(finalPrice)) + ' ₽';
+    }
+
+    // Слушаем изменения во всех инпутах
+    const allInputs = document.querySelectorAll('input[type="number"], select');
+    allInputs.forEach(input => {
+        input.addEventListener('input', calculate);
+        input.addEventListener('change', calculate);
+    });
+
+    // Первый расчет
+    calculate();
+</script>
+
+</body>
+</html>
