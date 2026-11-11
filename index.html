@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Кухонная История</title>
+    
+    <!-- Подключаем библиотеку для создания PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
     <style>
         :root {
             --brand-red: #b71c1c;
@@ -29,6 +33,7 @@
             max-width: 500px;
             border-top: 5px solid var(--brand-red);
             border-bottom: 5px solid var(--brand-red);
+            position: relative;
         }
         
         .header-section {
@@ -75,7 +80,6 @@
             color: white;
         }
 
-        /* Стили для красивых информационных блоков */
         .info-box {
             background-color: #fcfcfc;
             border: 1px solid #eee;
@@ -91,9 +95,6 @@
             display: flex;
             align-items: flex-start;
             margin-bottom: 4px;
-        }
-        .info-box div:last-child {
-            margin-bottom: 0;
         }
         .info-icon {
             color: var(--brand-red);
@@ -156,14 +157,8 @@
             grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
-        .admin-grid label {
-            font-size: 11px;
-            margin-bottom: 2px;
-        }
-        .admin-grid input {
-            padding: 6px;
-            font-size: 13px;
-        }
+        .admin-grid label { font-size: 11px; margin-bottom: 2px; }
+        .admin-grid input { padding: 6px; font-size: 13px; }
 
         .total-box {
             margin-top: 25px;
@@ -188,6 +183,39 @@
             color: white;
         }
 
+        /* Стили для кнопок действий */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn-action {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-pdf {
+            background-color: #f0f0f0;
+            color: var(--brand-dark);
+            border: 1px solid #ccc;
+        }
+        .btn-pdf:hover { background-color: #e0e0e0; }
+        
+        .btn-tg {
+            background-color: #0088cc;
+            color: white;
+        }
+        .btn-tg:hover { background-color: #006699; }
+
         .manager-info {
             margin-top: 20px;
             text-align: center;
@@ -204,31 +232,49 @@
             font-weight: bold;
             font-size: 16px;
         }
-        .manager-info a:hover {
-            text-decoration: underline;
-        }
 
         .hidden { display: none !important; }
-        
-        .length-inputs {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 5px;
+        .length-inputs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .helper-text { font-size: 11px; color: #888; margin-top: 6px; display: block; line-height: 1.4; }
+
+        /* Стили для скрытого бланка PDF */
+        #pdf-template {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            color: #333;
+            background: #fff;
+            width: 700px;
         }
-        
-        .helper-text {
-            font-size: 11px;
-            color: #888;
-            margin-top: 6px;
-            display: block;
-            line-height: 1.4;
+        #pdf-template .pdf-header {
+            text-align: center;
+            border-bottom: 3px solid #b71c1c;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        #pdf-template .pdf-logo { max-width: 200px; }
+        #pdf-template h2 { color: #b71c1c; margin-top: 0; }
+        #pdf-template .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        #pdf-template .pdf-table th, #pdf-template .pdf-table td {
+            border-bottom: 1px solid #eee;
+            padding: 12px;
+            text-align: left;
+        }
+        #pdf-template .pdf-table th { width: 60%; color: #777; }
+        #pdf-template .pdf-total {
+            text-align: right;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
-<div class="calculator-container">
+<div class="calculator-container" id="main-calculator">
     
     <div class="header-section">
         <img src="логотип.jpeg" alt="Кухонная История" class="logo" id="secret-logo">
@@ -240,87 +286,42 @@
         <button id="btn-wardrobe" onclick="setProduct('wardrobe')">Шкафы</button>
     </div>
 
-    <!-- ПАНЕЛЬ НАСТРОЙКИ ЦЕН -->
     <div class="admin-panel" id="admin-panel">
         <h3>⚙️ Настройка базовых цен</h3>
         
         <div class="admin-group-title">Кухни (база ЛДСП):</div>
         <div class="admin-grid">
-            <div>
-                <label>1 м. Кухни (₽)</label>
-                <input type="number" id="price-kitchen-base" value="55000">
-            </div>
-            <div>
-                <label>1 Пенал (фикс. ₽)</label>
-                <input type="number" id="price-penceal" value="35000">
-            </div>
-            <div>
-                <label>1 Ящик Blum (₽)</label>
-                <input type="number" id="price-drawer-blum" value="19000">
-            </div>
-            <div>
-                <label>1 Ящик Аналог (₽)</label>
-                <input type="number" id="price-drawer-analog" value="8000">
-            </div>
-            <div>
-                <label>Столешница ЛДСП (₽/м)</label>
-                <input type="number" id="price-countertop-ldsp" value="3000">
-            </div>
-            <div>
-                <label>Столешница Камень (₽/м)</label>
-                <input type="number" id="price-countertop-stone" value="23000">
-            </div>
+            <div><label>1 м. Кухни (₽)</label><input type="number" id="price-kitchen-base" value="55000"></div>
+            <div><label>1 Пенал (фикс. ₽)</label><input type="number" id="price-penceal" value="35000"></div>
+            <div><label>1 Ящик Blum (₽)</label><input type="number" id="price-drawer-blum" value="19000"></div>
+            <div><label>1 Ящик Аналог (₽)</label><input type="number" id="price-drawer-analog" value="8000"></div>
+            <div><label>Столешница ЛДСП (₽/м)</label><input type="number" id="price-countertop-ldsp" value="3000"></div>
+            <div><label>Столешница Камень (₽/м)</label><input type="number" id="price-countertop-stone" value="23000"></div>
         </div>
 
         <div class="admin-group-title">Наценки за фасады кухни (руб. к метру):</div>
         <div class="admin-grid">
-            <div>
-                <label>Пленка ПВХ (+₽/м)</label>
-                <input type="number" id="markup-pvh" value="6000">
-            </div>
-            <div>
-                <label>Пластик (+₽/м)</label>
-                <input type="number" id="markup-plastic" value="8000">
-            </div>
-            <div>
-                <label>Крашеные (+₽/м)</label>
-                <input type="number" id="markup-painted" value="20000">
-            </div>
+            <div><label>Пленка ПВХ (+₽/м)</label><input type="number" id="markup-pvh" value="6000"></div>
+            <div><label>Пластик (+₽/м)</label><input type="number" id="markup-plastic" value="8000"></div>
+            <div><label>Крашеные (+₽/м)</label><input type="number" id="markup-painted" value="20000"></div>
         </div>
 
         <div class="admin-group-title">Наценки за фасады пеналов (руб. к шт.):</div>
         <div class="admin-grid">
-            <div>
-                <label>Пленка ПВХ (+₽)</label>
-                <input type="number" id="markup-pvh-penceal" value="12000">
-            </div>
-            <div>
-                <label>Пластик (+₽)</label>
-                <input type="number" id="markup-plastic-penceal" value="15000">
-            </div>
-            <div>
-                <label>Крашеные (+₽)</label>
-                <input type="number" id="markup-painted-penceal" value="22000">
-            </div>
+            <div><label>Пленка ПВХ (+₽)</label><input type="number" id="markup-pvh-penceal" value="12000"></div>
+            <div><label>Пластик (+₽)</label><input type="number" id="markup-plastic-penceal" value="15000"></div>
+            <div><label>Крашеные (+₽)</label><input type="number" id="markup-painted-penceal" value="22000"></div>
         </div>
 
         <div class="admin-group-title">Шкафы:</div>
         <div class="admin-grid">
-            <div>
-                <label>1 м. Прямого (₽)</label>
-                <input type="number" id="price-wardrobe-straight" value="60000">
-            </div>
-            <div>
-                <label>1 м. Углового (₽)</label>
-                <input type="number" id="price-wardrobe-corner" value="65000">
-            </div>
+            <div><label>1 м. Прямого (₽)</label><input type="number" id="price-wardrobe-straight" value="60000"></div>
+            <div><label>1 м. Углового (₽)</label><input type="number" id="price-wardrobe-corner" value="65000"></div>
         </div>
     </div>
 
     <!-- ================= ФОРМА КУХНИ ================= -->
     <div id="form-kitchen">
-        
-        <!-- Красивый информационный блок -->
         <div class="info-box">
             <div><span class="info-icon">✓</span> <span><strong>Материал корпуса:</strong> ЛДСП Egger (Германия)</span></div>
             <div><span class="info-icon">✓</span> <span><strong>Петли:</strong> австрийские Blum</span></div>
@@ -329,8 +330,8 @@
         <div class="form-group">
             <label>Форма кухни</label>
             <select id="kitchen-form-type" onchange="updateLengthInputs()">
-                <option value="straight">Прямая</option>
-                <option value="corner">Г-образная</option>
+                <option value="Прямая">Прямая</option>
+                <option value="Г-образная">Г-образная</option>
             </select>
         </div>
 
@@ -361,35 +362,33 @@
         <div class="form-group">
             <label>Тип выдвижных ящиков</label>
             <select id="drawer-type">
-                <option value="blum">Ящики Blum</option>
-                <option value="analog">Ящики Аналог</option>
+                <option value="Blum">Ящики Blum</option>
+                <option value="Аналог">Ящики Аналог</option>
             </select>
         </div>
 
         <div class="form-group">
             <label>Столешница</label>
             <select id="countertop-type">
-                <option value="none">Без столешницы</option>
-                <option value="ldsp">ЛДСП</option>
-                <option value="stone">Искусственный камень</option>
+                <option value="Без столешницы">Без столешницы</option>
+                <option value="ЛДСП">ЛДСП</option>
+                <option value="Искусственный камень">Искусственный камень</option>
             </select>
         </div>
 
         <div class="form-group">
             <label>Материал фасадов кухни</label>
             <select id="material-main">
-                <option value="ldsp">ЛДСП</option>
-                <option value="pvh">Пленка ПВХ</option>
-                <option value="plastic">Пластик</option>
-                <option value="painted">Крашеные</option>
+                <option value="ЛДСП">ЛДСП</option>
+                <option value="Пленка ПВХ">Пленка ПВХ</option>
+                <option value="Пластик">Пластик</option>
+                <option value="Крашеные">Крашеные</option>
             </select>
         </div>
     </div>
 
     <!-- ================= ФОРМА ШКАФОВ ================= -->
     <div id="form-wardrobe" class="hidden">
-        
-        <!-- Красивый информационный блок (как в кухнях) -->
         <div class="info-box">
             <div><span class="info-icon">✓</span> <span><strong>Материал корпуса:</strong> ЛДСП Egger (Германия)</span></div>
             <div><span class="info-icon">✓</span> <span><strong>Петли:</strong> Blum</span></div>
@@ -400,8 +399,8 @@
         <div class="form-group">
             <label>Форма шкафа</label>
             <select id="wardrobe-form-type" onchange="updateWardrobeInputs()">
-                <option value="straight">Прямой</option>
-                <option value="corner">Угловой</option>
+                <option value="Прямой">Прямой</option>
+                <option value="Угловой">Угловой</option>
             </select>
         </div>
 
@@ -419,10 +418,10 @@
         <div class="form-group">
             <label>Материал фасадов</label>
             <select id="wardrobe-material">
-                <option value="ldsp">ЛДСП</option>
-                <option value="pvh">Пленка ПВХ</option>
-                <option value="plastic">Пластик</option>
-                <option value="painted">Крашеные</option>
+                <option value="ЛДСП">ЛДСП</option>
+                <option value="Пленка ПВХ">Пленка ПВХ</option>
+                <option value="Пластик">Пластик</option>
+                <option value="Крашеные">Крашеные</option>
             </select>
         </div>
     </div>
@@ -433,6 +432,18 @@
         <div class="total-price" id="total-price">0 ₽</div>
     </div>
 
+    <!-- Кнопки действий -->
+    <div class="action-buttons">
+        <button class="btn-action btn-pdf" onclick="downloadPDF()">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+            Скачать PDF
+        </button>
+        <button class="btn-action btn-tg" onclick="sendToTelegram()">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.287 5.906c-.778.324-2.334.994-4.666 2.01-.378.15-.577.298-.595.442-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294.26.006.549-.1.868-.32 2.179-1.471 3.304-2.214 3.374-2.23.05-.012.12-.026.166.016.047.041.042.12.037.141-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8.154 8.154 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629.093.06.183.125.27.187.331.23.629.435.987.382.21-.03.425-.223.535-.83.274-1.515.828-4.795.883-5.154.005-.035.002-.176-.05-.23-.052-.054-.14-.077-.21-.066z"/></svg>
+            В Telegram
+        </button>
+    </div>
+
     <!-- Контакты менеджера -->
     <div class="manager-info">
         Ваш менеджер: <strong>Иван</strong><br>
@@ -441,7 +452,34 @@
 
 </div>
 
+<!-- Скрытый шаблон для PDF -->
+<div id="pdf-template" class="hidden">
+    <div class="pdf-header">
+        <img src="логотип.jpeg" alt="Логотип" class="pdf-logo">
+        <h2>Расчет стоимости</h2>
+    </div>
+    <table class="pdf-table">
+        <tbody id="pdf-table-body">
+            <!-- Заполняется через JS -->
+        </tbody>
+    </table>
+    <div class="pdf-total">
+        Итого: <span id="pdf-total-price">0 ₽</span>
+    </div>
+    <div style="margin-top: 50px; font-size: 14px; color: #777; text-align: center;">
+        Менеджер: Иван<br>
+        Телефон: 8-923-133-4233<br>
+        Спасибо, что выбрали «Кухонная История»!
+    </div>
+</div>
+
 <script>
+    // --- НАСТРОЙКИ TELEGRAM ---
+    // Вставь сюда токен бота и свой ID (инструкция в чате)
+    const TG_BOT_TOKEN = 'ВСТАВЬ_СЮДА_ТОКЕН_БОТА';
+    const TG_CHAT_ID = 'ВСТАВЬ_СЮДА_СВОЙ_ID';
+    // ---------------------------
+
     let currentProduct = 'kitchen';
     const PENCEAL_WIDTH_METERS = 0.6; 
     const CORNER_OVERLAP = 0.6;       
@@ -482,7 +520,7 @@
 
     function updateLengthInputs() {
         const formType = document.getElementById('kitchen-form-type').value;
-        if (formType === 'straight') {
+        if (formType === 'Прямая') {
             document.getElementById('len-group-2').classList.add('hidden');
         } else {
             document.getElementById('len-group-2').classList.remove('hidden');
@@ -492,7 +530,7 @@
 
     function updateWardrobeInputs() {
         const formType = document.getElementById('wardrobe-form-type').value;
-        if (formType === 'corner') {
+        if (formType === 'Угловой') {
             document.getElementById('wardrobe-len-group-2').classList.remove('hidden');
         } else {
             document.getElementById('wardrobe-len-group-2').classList.add('hidden');
@@ -500,28 +538,158 @@
         calculate();
     }
 
+    // Сбор всех данных для сообщения и PDF
+    function getOrderDetails() {
+        let details = {};
+        
+        if (currentProduct === 'kitchen') {
+            const formType = document.getElementById('kitchen-form-type').value;
+            let len1 = parseFloat(document.getElementById('len-main-1').value) || 0;
+            let len2 = parseFloat(document.getElementById('len-main-2').value) || 0;
+            let totalLen = len1 + (formType === 'Г-образная' ? len2 - CORNER_OVERLAP : 0);
+            let pencealsCount = parseInt(document.getElementById('penceals-count').value) || 0;
+            let standardLength = Math.max(0, totalLen - (pencealsCount * PENCEAL_WIDTH_METERS));
+
+            details = {
+                type: 'Кухня',
+                form: formType,
+                length: totalLen.toFixed(2) + ' м (из них ' + standardLength.toFixed(2) + ' м обычных шкафов)',
+                penceals: pencealsCount + ' шт.',
+                drawers: (parseInt(document.getElementById('drawers-count').value) || 0) + ' шт. (' + document.getElementById('drawer-type').value + ')',
+                countertop: document.getElementById('countertop-type').value,
+                material: document.getElementById('material-main').value
+            };
+        } else {
+            const formType = document.getElementById('wardrobe-form-type').value;
+            let len1 = parseFloat(document.getElementById('len-wardrobe-1').value) || 0;
+            let len2 = parseFloat(document.getElementById('len-wardrobe-2').value) || 0;
+            let totalLen = len1 + (formType === 'Угловой' ? len2 - CORNER_OVERLAP : 0);
+            details = {
+                type: 'Шкаф',
+                form: formType,
+                length: totalLen.toFixed(2) + ' м',
+                material: document.getElementById('wardrobe-material').value
+            };
+        }
+        
+        details.totalPrice = document.getElementById('total-price').innerText;
+        return details;
+    }
+
+    function downloadPDF() {
+        const details = getOrderDetails();
+        const tableBody = document.getElementById('pdf-table-body');
+        const totalPriceSpan = document.getElementById('pdf-total-price');
+        
+        tableBody.innerHTML = '';
+        
+        // Заполняем таблицу данными
+        let rows = '';
+        for (const [key, value] of Object.entries(details)) {
+            if (key === 'totalPrice' || key === 'type') continue;
+            
+            let label = '';
+            if (key === 'form') label = 'Форма';
+            if (key === 'length') label = 'Длина';
+            if (key === 'penceals') label = 'Пеналы';
+            if (key === 'drawers') label = 'Ящики';
+            if (key === 'countertop') label = 'Столешница';
+            if (key === 'material') label = 'Фасады';
+            
+            rows += `<tr><th>${label}</th><td>${value}</td></tr>`;
+        }
+        
+        // Добавляем заголовок с типом изделия
+        rows = `<tr><th>Изделие</th><td style="font-weight:bold; color:#b71c1c;">${details.type}</td></tr>` + rows;
+        
+        tableBody.innerHTML = rows;
+        totalPriceSpan.innerText = details.totalPrice;
+
+        // Генерируем PDF
+        const element = document.getElementById('pdf-template');
+        const opt = {
+            margin:       1,
+            filename:     'Расчет_Кухонная_История.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save();
+    }
+
+    function sendToTelegram() {
+        // Проверка, что токен вставлен
+        if (TG_BOT_TOKEN === 'ВСТАВЬ_СЮДА_ТОКЕН_БОТА') {
+            alert('Внимание! В код не вставлен Токен Telegram-бота. Инструкция в чате.');
+            return;
+        }
+
+        const details = getOrderDetails();
+        
+        // Формируем красивое сообщение
+        let message = `🔥 <b>Новый расчет с сайта!</b>\n\n`;
+        message += `<b>Изделие:</b> ${details.type}\n`;
+        message += `<b>Форма:</b> ${details.form}\n`;
+        message += `<b>Длина:</b> ${details.length}\n`;
+        
+        if (details.type === 'Кухня') {
+            message += `<b>Пеналы:</b> ${details.penceals}\n`;
+            message += `<b>Ящики:</b> ${details.drawers}\n`;
+            message += `<b>Столешница:</b> ${details.countertop}\n`;
+        }
+        
+        message += `<b>Фасады:</b> ${details.material}\n\n`;
+        message += `<b>💰 Итого: ${details.totalPrice}</b>\n\n`;
+        message += `📞 <i>Клиенту нужен звонок менеджера Ивана!</i>`;
+
+        // Отправка через Telegram API
+        const url = `https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`;
+        
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TG_CHAT_ID,
+                text: message,
+                parse_mode: 'HTML'
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Заявка успешно отправлена! Менеджер Иван свяжется с вами.');
+            } else {
+                alert('Ошибка при отправке. Пожалуйста, позвоните нам напрямую.');
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Ошибка сети. Пожалуйста, позвоните нам напрямую.');
+        });
+    }
+
     function calculate() {
         let finalPrice = 0;
-
+        
+        // ... (предыдущий код расчета цен) ...
         const markupPvh = parseFloat(document.getElementById('markup-pvh').value) || 0;
         const markupPlastic = parseFloat(document.getElementById('markup-plastic').value) || 0;
         const markupPainted = parseFloat(document.getElementById('markup-painted').value) || 0;
-
         const markupPvhPenceal = parseFloat(document.getElementById('markup-pvh-penceal').value) || 0;
         const markupPlasticPenceal = parseFloat(document.getElementById('markup-plastic-penceal').value) || 0;
         const markupPaintedPenceal = parseFloat(document.getElementById('markup-painted-penceal').value) || 0;
 
         function getFacadeMarkup(material) {
-            if (material === 'pvh') return markupPvh;
-            if (material === 'plastic') return markupPlastic;
-            if (material === 'painted') return markupPainted;
+            if (material === 'Пленка ПВХ') return markupPvh;
+            if (material === 'Пластик') return markupPlastic;
+            if (material === 'Крашеные') return markupPainted;
             return 0;
         }
 
         function getPencealMarkup(material) {
-            if (material === 'pvh') return markupPvhPenceal;
-            if (material === 'plastic') return markupPlasticPenceal;
-            if (material === 'painted') return markupPaintedPenceal;
+            if (material === 'Пленка ПВХ') return markupPvhPenceal;
+            if (material === 'Пластик') return markupPlasticPenceal;
+            if (material === 'Крашеные') return markupPaintedPenceal;
             return 0;
         }
 
@@ -531,7 +699,7 @@
             let len2 = parseFloat(document.getElementById('len-main-2').value) || 0;
             let rawTotalLength = len1;
             
-            if (formType === 'corner') {
+            if (formType === 'Г-образная') {
                 rawTotalLength += len2;
                 rawTotalLength -= CORNER_OVERLAP; 
             }
@@ -557,14 +725,14 @@
             const drawerType = document.getElementById('drawer-type').value;
             const priceBlum = parseFloat(document.getElementById('price-drawer-blum').value) || 0;
             const priceAnalog = parseFloat(document.getElementById('price-drawer-analog').value) || 0;
-            let costDrawers = drawersCount * (drawerType === 'blum' ? priceBlum : priceAnalog);
+            let costDrawers = drawersCount * (drawerType === 'Blum' ? priceBlum : priceAnalog);
 
             const countertopType = document.getElementById('countertop-type').value;
             const priceCtLdsp = parseFloat(document.getElementById('price-countertop-ldsp').value) || 0;
             const priceCtStone = parseFloat(document.getElementById('price-countertop-stone').value) || 0;
             let costCountertop = 0;
-            if (countertopType === 'ldsp') costCountertop = standardLength * priceCtLdsp;
-            if (countertopType === 'stone') costCountertop = standardLength * priceCtStone;
+            if (countertopType === 'ЛДСП') costCountertop = standardLength * priceCtLdsp;
+            if (countertopType === 'Искусственный камень') costCountertop = standardLength * priceCtStone;
 
             finalPrice = costStandard + costPenceals + costFacadeMain + costDrawers + costCountertop;
 
@@ -579,7 +747,7 @@
             let totalLen = lenWardrobe1;
             let pricePerMeter = priceWardrobeStraight;
 
-            if (wardrobeType === 'corner') {
+            if (wardrobeType === 'Угловой') {
                 let lenWardrobe2 = parseFloat(document.getElementById('len-wardrobe-2').value) || 0;
                 totalLen = lenWardrobe1 + lenWardrobe2 - CORNER_OVERLAP; 
                 totalLen = Math.max(0, totalLen);
