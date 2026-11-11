@@ -22,7 +22,7 @@
             justify-content: center;
             padding: 20px;
             margin: 0;
-            overflow-x: hidden; /* Защита от горизонтального скролла из-за скрытого PDF */
+            overflow-x: hidden; 
         }
         
         .calculator-container {
@@ -35,6 +35,7 @@
             border-top: 5px solid var(--brand-red);
             border-bottom: 5px solid var(--brand-red);
             position: relative;
+            z-index: 10; /* Калькулятор поверх бланка PDF */
         }
         
         .header-section {
@@ -184,7 +185,6 @@
             color: white;
         }
 
-        /* Стили для кнопок действий */
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -211,7 +211,6 @@
         }
         .btn-pdf:hover { background-color: #e0e0e0; }
         
-        /* Изменили цвет на зеленый для WhatsApp */
         .btn-wa {
             background-color: #25D366; 
             color: white;
@@ -239,17 +238,19 @@
         .length-inputs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
         .helper-text { font-size: 11px; color: #888; margin-top: 6px; display: block; line-height: 1.4; }
 
-        /* Стили для скрытого бланка PDF */
-        /* ВАЖНО: Мы убрали display:none, теперь бланк просто спрятан за левым краем экрана */
+        /* ХИТРОСТЬ: Прячем бланк PDF, но оставляем его на экране для библиотеки */
         #pdf-template {
             position: absolute;
-            left: -9999px;
+            left: 0;
             top: 0;
+            z-index: -1000; /* Уводим на задний план */
+            opacity: 0.01; /* Делаем почти невидимым, но библиотека его видит */
+            pointer-events: none; /* Отключаем клики */
             font-family: Arial, sans-serif;
             padding: 40px;
             color: #333;
             background: #fff;
-            width: 700px;
+            width: 750px; /* Фиксированная ширина для PDF */
         }
         #pdf-template .pdf-header {
             text-align: center;
@@ -447,7 +448,6 @@
             Скачать PDF
         </button>
         <button class="btn-action btn-wa" onclick="sendToWhatsApp()">
-            <!-- Иконка WhatsApp -->
             <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.1-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg>
             В WhatsApp
         </button>
@@ -461,7 +461,7 @@
 
 </div>
 
-<!-- Скрытый шаблон для PDF (теперь он за краем экрана, а не display:none) -->
+<!-- Бланк для PDF (невидим для глаз, но виден для библиотеки) -->
 <div id="pdf-template">
     <div class="pdf-header">
         <img src="логотип.jpeg" alt="Кухонная История" class="pdf-logo">
@@ -541,7 +541,6 @@
         calculate();
     }
 
-    // Сбор всех данных для сообщения и PDF
     function getOrderDetails() {
         let details = {};
         
@@ -579,7 +578,7 @@
         return details;
     }
 
-    // Скачивание PDF
+    // ФУНКЦИЯ СКАЧИВАНИЯ PDF
     function downloadPDF() {
         const details = getOrderDetails();
         const tableBody = document.getElementById('pdf-table-body');
@@ -610,22 +609,23 @@
         
         // Настройки PDF
         const opt = {
-            margin:       1,
+            margin:       10,
             filename:     'Расчет_Кухонная_История.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
-            // useCORS: true - ВАЖНО для загрузки картинок!
             html2canvas:  { scale: 2, useCORS: true, logging: false },
-            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        html2pdf().set(opt).from(element).save();
+        // Добавляем задержку в 300мс, чтобы браузер успел отрисовать логотип и таблицу
+        setTimeout(() => {
+            html2pdf().set(opt).from(element).save();
+        }, 300);
     }
 
-    // Отправка в WhatsApp
+    // ФУНКЦИЯ ОТПРАВКИ В WHATSAPP
     function sendToWhatsApp() {
         const details = getOrderDetails();
         
-        // Формируем текст сообщения
         let message = `Здравствуйте! Сделал расчет на сайте.\n\n`;
         message += `Изделие: ${details.type}\n`;
         message += `Форма: ${details.form}\n`;
@@ -641,13 +641,9 @@
         message += `Итого: ${details.totalPrice}\n\n`;
         message += `Пришлите, пожалуйста, точный расчет.`;
 
-        // Кодируем текст для ссылки
         const encodedMessage = encodeURIComponent(message);
+        const phone = '79231334233'; // Номер Ивана
         
-        // Номер телефона Ивана (8-923-133-4233) переводим в международный формат (79231334233)
-        const phone = '79231334233';
-        
-        // Открываем WhatsApp (сработает и на телефоне, и на ПК)
         window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
     }
 
