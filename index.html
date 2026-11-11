@@ -37,11 +37,15 @@
             margin-bottom: 20px;
         }
         
+        /* Добавил курсор поинтер и запрет на выделение текста при клике */
         .logo {
             display: inline-block;
             max-width: 300px;
             margin: 0 auto;
             width: 100%;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .red-divider {
@@ -106,7 +110,9 @@
             border-color: var(--brand-red);
         }
         
+        /* Скрываем панель по умолчанию */
         .admin-panel {
+            display: none; 
             border: 2px dashed var(--brand-red);
             padding: 15px;
             border-radius: 8px;
@@ -186,11 +192,25 @@
             display: none !important;
         }
 
-        /* Стили для динамических полей длины */
         .length-inputs {
             display: flex;
             flex-direction: column;
             gap: 10px;
+        }
+        
+        .helper-text {
+            font-size: 11px;
+            color: #777;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .height-warning {
+            color: var(--brand-red);
+            font-weight: bold;
+            display: block;
+            margin-top: 8px;
+            font-size: 12px;
         }
     </style>
 </head>
@@ -199,7 +219,7 @@
 <div class="calculator-container">
     
     <div class="header-section">
-        <img src="логотип.jpeg" alt="Кухонная История" class="logo">
+        <img src="логотип.jpeg" alt="Кухонная История" class="logo" id="secret-logo">
         <div class="red-divider"></div>
     </div>
 
@@ -208,8 +228,8 @@
         <button id="btn-wardrobe" onclick="setProduct('wardrobe')">Шкафы</button>
     </div>
 
-    <!-- ПАНЕЛЬ НАСТРОЙКИ ЦЕН -->
-    <div class="admin-panel">
+    <!-- ПАНЕЛЬ НАСТРОЙКИ ЦЕН (Скрыта, открывается тройным кликом на лого) -->
+    <div class="admin-panel" id="admin-panel">
         <h3>⚙️ Настройка базовых цен</h3>
         
         <div class="admin-group-title">Кухни (база ЛДСП):</div>
@@ -273,22 +293,22 @@
     <div id="form-kitchen">
         <div class="info-box">
             <strong>Базовая комплектация:</strong> Корпус ЛДСП Egger, фасады ЛДСП, петли Blum.<br>
-            <em>Выберите форму кухни, чтобы указать размеры.</em>
+            <em>Указывайте размеры стен от угла до угла — программа сама вычтет стыки (по 600 мм на угол).</em>
         </div>
 
         <div class="form-group">
             <label>Форма кухни</label>
             <select id="kitchen-form-type" onchange="updateLengthInputs()">
                 <option value="straight">Прямая</option>
-                <option value="corner">Угловая (Г-образная)</option>
+                <option value="corner">Г-образная</option>
                 <option value="u-shape">П-образная</option>
             </select>
         </div>
 
-        <!-- Динамические поля длины -->
+        <!-- Динамические поля длины (Кухни) -->
         <div class="length-inputs" id="length-inputs-container">
             <div class="form-group">
-                <label>Длина кухни (в метрах)</label>
+                <label>Длина основной стены (в метрах)</label>
                 <input type="number" id="len-main-1" value="3" min="0" step="0.1">
             </div>
             <div class="form-group hidden" id="len-group-2">
@@ -305,7 +325,7 @@
         <div class="form-group">
             <label>Количество пеналов (высоких шкафов), шт.</label>
             <input type="number" id="penceals-count" value="0" min="0" step="1">
-            <small style="color: #777; font-size: 11px;">*1 пенал (шириной 60см) автоматически вычитается из общей длины кухни.</small>
+            <span class="helper-text">*Каждый пенал занимает 0.6 м длины и вычитается из общей длины кухни.</span>
         </div>
 
         <!-- Выдвижные ящики -->
@@ -332,19 +352,8 @@
         </div>
 
         <div class="form-group">
-            <label>Материал основных фасадов</label>
+            <label>Материал фасадов кухни</label>
             <select id="material-main">
-                <option value="ldsp">ЛДСП (включено в базу)</option>
-                <option value="pvh">Пленка ПВХ (наценка)</option>
-                <option value="plastic">Пластик (наценка)</option>
-                <option value="painted">Крашеные (наценка)</option>
-            </select>
-        </div>
-
-        <!-- Фасад для пеналов (если они есть) -->
-        <div class="form-group" id="penceal-material-group" style="display: none;">
-            <label>Материал фасадов пеналов</label>
-            <select id="material-penceal">
                 <option value="ldsp">ЛДСП (включено в базу)</option>
                 <option value="pvh">Пленка ПВХ (наценка)</option>
                 <option value="plastic">Пластик (наценка)</option>
@@ -357,20 +366,29 @@
     <div id="form-wardrobe" class="hidden">
         <div class="info-box">
             <strong>Материал корпуса:</strong> ЛДСП Egger (премиум-класс)<br>
-            <strong>Петли:</strong> Blum с доводчиками
+            <strong>Петли:</strong> Blum с доводчиками<br>
+            <strong>Глубина:</strong> 600 мм<br>
+            <span class="height-warning">* Цена указана с расчетом шкафа при высоте до 2700 мм. Если выше — доплата (обсуждается с менеджером).</span>
         </div>
 
         <div class="form-group">
             <label>Форма шкафа</label>
-            <select id="wardrobe-form-type">
+            <select id="wardrobe-form-type" onchange="updateWardrobeInputs()">
                 <option value="straight">Прямой</option>
                 <option value="corner">Угловой</option>
             </select>
         </div>
 
-        <div class="form-group">
-            <label>Общая длина шкафа (в метрах)</label>
-            <input type="number" id="len-wardrobe" value="2" min="0" step="0.1">
+        <!-- Динамические поля длины (Шкафы) -->
+        <div class="length-inputs">
+            <div class="form-group">
+                <label>Длина основной стены (в метрах)</label>
+                <input type="number" id="len-wardrobe-1" value="2" min="0" step="0.1">
+            </div>
+            <div class="form-group hidden" id="wardrobe-len-group-2">
+                <label>Длина второй стены (в метрах)</label>
+                <input type="number" id="len-wardrobe-2" value="1.5" min="0" step="0.1">
+            </div>
         </div>
         
         <div class="form-group">
@@ -400,7 +418,32 @@
 
 <script>
     let currentProduct = 'kitchen';
-    const PENCEAL_WIDTH_METERS = 0.6; // Стандартная ширина пенала для вычета из длины
+    const PENCEAL_WIDTH_METERS = 0.6; 
+    const CORNER_OVERLAP = 0.6;       
+
+    // --- СЕКРЕТНАЯ ПАНЕЛЬ (ТРОЙНОЙ КЛИК) ---
+    let clickCount = 0;
+    let clickTimer;
+    const logo = document.getElementById('secret-logo');
+    const adminPanel = document.getElementById('admin-panel');
+
+    logo.addEventListener('click', function() {
+        clickCount++;
+        if (clickCount === 1) {
+            // Сбрасываем счетчик через 600 мс, если не было следующих кликов
+            clickTimer = setTimeout(() => { clickCount = 0; }, 600);
+        } else if (clickCount === 3) {
+            clearTimeout(clickTimer);
+            clickCount = 0;
+            // Переключаем видимость
+            if (adminPanel.style.display === 'block') {
+                adminPanel.style.display = 'none';
+            } else {
+                adminPanel.style.display = 'block';
+            }
+        }
+    });
+    // --------------------------------------
 
     function setProduct(type) {
         currentProduct = type;
@@ -419,7 +462,6 @@
         calculate();
     }
 
-    // Логика показа полей длины в зависимости от формы кухни
     function updateLengthInputs() {
         const formType = document.getElementById('kitchen-form-type').value;
         const group2 = document.getElementById('len-group-2');
@@ -438,21 +480,21 @@
         calculate();
     }
 
-    // Показ выбора фасада для пеналов, если они выбраны
-    function togglePencealMaterial() {
-        const count = parseInt(document.getElementById('penceals-count').value) || 0;
-        const pencealMatGroup = document.getElementById('penceal-material-group');
-        if (count > 0) {
-            pencealMatGroup.style.display = 'block';
+    function updateWardrobeInputs() {
+        const formType = document.getElementById('wardrobe-form-type').value;
+        const group2 = document.getElementById('wardrobe-len-group-2');
+        
+        if (formType === 'corner') {
+            group2.classList.remove('hidden');
         } else {
-            pencealMatGroup.style.display = 'none';
+            group2.classList.add('hidden');
         }
+        calculate();
     }
 
     function calculate() {
         let finalPrice = 0;
 
-        // Общие данные для расчета фасадов
         const markupPvh = parseFloat(document.getElementById('markup-pvh').value) || 0;
         const markupPlastic = parseFloat(document.getElementById('markup-plastic').value) || 0;
         const markupPainted = parseFloat(document.getElementById('markup-painted').value) || 0;
@@ -465,47 +507,39 @@
         }
 
         if (currentProduct === 'kitchen') {
-            // 1. Считаем общую длину кухни
             const formType = document.getElementById('kitchen-form-type').value;
-            let totalLength = parseFloat(document.getElementById('len-main-1').value) || 0;
+            let rawTotalLength = parseFloat(document.getElementById('len-main-1').value) || 0;
             
-            if (formType !== 'straight') {
-                totalLength += parseFloat(document.getElementById('len-main-2').value) || 0;
+            if (formType === 'corner') {
+                rawTotalLength += parseFloat(document.getElementById('len-main-2').value) || 0;
+                rawTotalLength -= CORNER_OVERLAP; 
+            } else if (formType === 'u-shape') {
+                rawTotalLength += parseFloat(document.getElementById('len-main-2').value) || 0;
+                rawTotalLength += parseFloat(document.getElementById('len-main-3').value) || 0;
+                rawTotalLength -= (CORNER_OVERLAP * 2); 
             }
-            if (formType === 'u-shape') {
-                totalLength += parseFloat(document.getElementById('len-main-3').value) || 0;
-            }
-
-            // 2. Вычитаем пеналы
+            
+            rawTotalLength = Math.max(0, rawTotalLength);
             const pencealsCount = parseInt(document.getElementById('penceals-count').value) || 0;
             const pencealDeduction = pencealsCount * PENCEAL_WIDTH_METERS;
-            let standardLength = Math.max(0, totalLength - pencealDeduction); // Защита от отрицательных чисел
+            let standardLength = Math.max(0, rawTotalLength - pencealDeduction);
 
-            // 3. Считаем базовые цены
             const priceBase = parseFloat(document.getElementById('price-kitchen-base').value) || 0;
             const pricePenceal = parseFloat(document.getElementById('price-penceal').value) || 0;
             
             let costStandard = standardLength * priceBase;
             let costPenceals = pencealsCount * pricePenceal;
 
-            // 4. Применяем наценки на фасады (только на длину обычных шкафов)
             const materialMain = document.getElementById('material-main').value;
             const markupMain = getFacadeMarkup(materialMain);
             let costFacadeMain = standardLength * markupMain;
 
-            // 5. Применяем наценки на фасады пеналов (на каждый пенал шириной 0.6м)
-            const materialPenceal = document.getElementById('material-penceal').value;
-            const markupPenceal = getFacadeMarkup(materialPenceal);
-            let costFacadePenceal = (pencealsCount * PENCEAL_WIDTH_METERS) * markupPenceal;
-
-            // 6. Ящики
             const drawersCount = parseInt(document.getElementById('drawers-count').value) || 0;
             const drawerType = document.getElementById('drawer-type').value;
             const priceBlum = parseFloat(document.getElementById('price-drawer-blum').value) || 0;
             const priceAnalog = parseFloat(document.getElementById('price-drawer-analog').value) || 0;
             let costDrawers = drawersCount * (drawerType === 'blum' ? priceBlum : priceAnalog);
 
-            // 7. Столешница (считаем только на длину обычных шкафов)
             const countertopType = document.getElementById('countertop-type').value;
             const priceCtLdsp = parseFloat(document.getElementById('price-countertop-ldsp').value) || 0;
             const priceCtStone = parseFloat(document.getElementById('price-countertop-stone').value) || 0;
@@ -513,44 +547,42 @@
             if (countertopType === 'ldsp') costCountertop = standardLength * priceCtLdsp;
             if (countertopType === 'stone') costCountertop = standardLength * priceCtStone;
 
-            // ИТОГО ДЛЯ КУХНИ
-            finalPrice = costStandard + costPenceals + costFacadeMain + costFacadePenceal + costDrawers + costCountertop;
+            finalPrice = costStandard + costPenceals + costFacadeMain + costDrawers + costCountertop;
 
         } else {
-            // Логика для ШКАФОВ
             const priceWardrobeStraight = parseFloat(document.getElementById('price-wardrobe-straight').value) || 0;
             const priceWardrobeCorner = parseFloat(document.getElementById('price-wardrobe-corner').value) || 0;
             
-            const lenWardrobe = parseFloat(document.getElementById('len-wardrobe').value) || 0;
             const wardrobeType = document.getElementById('wardrobe-form-type').value;
             const material = document.getElementById('wardrobe-material').value;
             
-            let pricePerMeter = (wardrobeType === 'straight') ? priceWardrobeStraight : priceWardrobeCorner;
-            // Для шкафов пока применяем наценку просто к метру (если понадобится - уточним логику)
+            let lenWardrobe1 = parseFloat(document.getElementById('len-wardrobe-1').value) || 0;
+            let totalLen = lenWardrobe1;
+            let pricePerMeter = priceWardrobeStraight;
+
+            if (wardrobeType === 'corner') {
+                let lenWardrobe2 = parseFloat(document.getElementById('len-wardrobe-2').value) || 0;
+                totalLen = lenWardrobe1 + lenWardrobe2 - CORNER_OVERLAP; 
+                totalLen = Math.max(0, totalLen);
+                pricePerMeter = priceWardrobeCorner;
+            }
+            
             let markup = getFacadeMarkup(material);
             
-            finalPrice = lenWardrobe * (pricePerMeter + markup);
+            finalPrice = totalLen * (pricePerMeter + markup);
         }
 
-        // Выводим итог
         document.getElementById('total-price').innerText = new Intl.NumberFormat('ru-RU').format(Math.round(finalPrice)) + ' ₽';
     }
 
-    // Слушаем изменения
     const allInputs = document.querySelectorAll('input[type="number"], select');
     allInputs.forEach(input => {
-        input.addEventListener('input', () => {
-            if (input.id === 'penceals-count') togglePencealMaterial();
-            calculate();
-        });
-        input.addEventListener('change', () => {
-            if (input.id === 'penceals-count') togglePencealMaterial();
-            calculate();
-        });
+        input.addEventListener('input', calculate);
+        input.addEventListener('change', calculate);
     });
 
-    // Инициализация
     updateLengthInputs();
+    updateWardrobeInputs();
     calculate();
 </script>
 
