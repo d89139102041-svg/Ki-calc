@@ -109,9 +109,8 @@
             border-color: var(--brand-red);
         }
         
-        /* Скрытая панель */
         .admin-panel {
-            display: none; 
+            display: block; 
             border: 2px dashed var(--brand-red);
             padding: 15px;
             border-radius: 8px;
@@ -195,6 +194,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            margin-bottom: 5px;
         }
         
         .helper-text {
@@ -202,6 +202,7 @@
             color: #777;
             margin-top: 5px;
             display: block;
+            line-height: 1.4;
         }
 
         .height-warning {
@@ -227,35 +228,34 @@
         <button id="btn-wardrobe" onclick="setProduct('wardrobe')">Шкафы</button>
     </div>
 
-    <!-- ПАНЕЛЬ НАСТРОИКИ ЦЕН (Скрыта, открывается троиным кликом на лого) -->
     <div class="admin-panel" id="admin-panel">
-        <h3>⚙️ Настроика базовых цен</h3>
+        <h3>⚙️ Настройка базовых цен</h3>
         
         <div class="admin-group-title">Кухни (база ЛДСП):</div>
         <div class="admin-grid">
             <div>
                 <label>1 м. Кухни (₽)</label>
-                <input type="number" id="price-kitchen-base" value="20000">
+                <input type="number" id="price-kitchen-base" value="55000">
             </div>
             <div>
                 <label>1 Пенал (фикс. ₽)</label>
-                <input type="number" id="price-penceal" value="25000">
+                <input type="number" id="price-penceal" value="35000">
             </div>
             <div>
                 <label>1 Ящик Blum (₽)</label>
-                <input type="number" id="price-drawer-blum" value="5000">
+                <input type="number" id="price-drawer-blum" value="19000">
             </div>
             <div>
                 <label>1 Ящик Аналог (₽)</label>
-                <input type="number" id="price-drawer-analog" value="3000">
+                <input type="number" id="price-drawer-analog" value="8000">
             </div>
             <div>
                 <label>Столешница ЛДСП (₽/м)</label>
-                <input type="number" id="price-countertop-ldsp" value="5000">
+                <input type="number" id="price-countertop-ldsp" value="3000">
             </div>
             <div>
                 <label>Столешница Камень (₽/м)</label>
-                <input type="number" id="price-countertop-stone" value="15000">
+                <input type="number" id="price-countertop-stone" value="23000">
             </div>
         </div>
 
@@ -263,15 +263,15 @@
         <div class="admin-grid">
             <div>
                 <label>Пленка ПВХ (+₽/м)</label>
-                <input type="number" id="markup-pvh" value="3000">
+                <input type="number" id="markup-pvh" value="6000">
             </div>
             <div>
                 <label>Пластик (+₽/м)</label>
-                <input type="number" id="markup-plastic" value="6000">
+                <input type="number" id="markup-plastic" value="8000">
             </div>
             <div>
                 <label>Крашеные (+₽/м)</label>
-                <input type="number" id="markup-painted" value="8000">
+                <input type="number" id="markup-painted" value="20000">
             </div>
         </div>
 
@@ -279,15 +279,15 @@
         <div class="admin-grid">
             <div>
                 <label>Пленка ПВХ (+₽)</label>
-                <input type="number" id="markup-pvh-penceal" value="2000">
+                <input type="number" id="markup-pvh-penceal" value="12000">
             </div>
             <div>
                 <label>Пластик (+₽)</label>
-                <input type="number" id="markup-plastic-penceal" value="4000">
+                <input type="number" id="markup-plastic-penceal" value="15000">
             </div>
             <div>
                 <label>Крашеные (+₽)</label>
-                <input type="number" id="markup-painted-penceal" value="6000">
+                <input type="number" id="markup-painted-penceal" value="22000">
             </div>
         </div>
 
@@ -295,20 +295,20 @@
         <div class="admin-grid">
             <div>
                 <label>1 м. Прямого (₽)</label>
-                <input type="number" id="price-wardrobe-straight" value="20000">
+                <input type="number" id="price-wardrobe-straight" value="60000">
             </div>
             <div>
                 <label>1 м. Углового (₽)</label>
-                <input type="number" id="price-wardrobe-corner" value="25000">
+                <input type="number" id="price-wardrobe-corner" value="65000">
             </div>
         </div>
     </div>
 
     <!-- ================= ФОРМА КУХНИ ================= -->
     <div id="form-kitchen">
+        
         <div class="info-box">
-            <strong>Базовая комплектация:</strong> Корпус ЛДСП Egger, фасады ЛДСП, петли Blum.<br>
-            <em>Указываите размеры стен от угла до угла — программа сама вычтет стыки (по 600 мм на угол).</em>
+            <strong>В комплектацию входит:</strong> качественное ЛДСП Egger (Германия), австрийские петли Blum на открывание.
         </div>
 
         <div class="form-group">
@@ -322,23 +322,25 @@
 
         <div class="length-inputs" id="length-inputs-container">
             <div class="form-group">
-                <label>Длина основнои стены (в метрах)</label>
+                <label>Длина основной стены (в метрах)</label>
                 <input type="number" id="len-main-1" value="3" min="0" step="0.1">
             </div>
             <div class="form-group hidden" id="len-group-2">
-                <label>Длина второи стены (в метрах)</label>
+                <label>Длина второй стены (в метрах)</label>
                 <input type="number" id="len-main-2" value="2" min="0" step="0.1">
             </div>
             <div class="form-group hidden" id="len-group-3">
-                <label>Длина третьеи стены (в метрах)</label>
+                <label>Длина третьей стены (в метрах)</label>
                 <input type="number" id="len-main-3" value="2" min="0" step="0.1">
             </div>
         </div>
+        
+        <span class="helper-text">* Указывайте размеры от стены до угла. Программа сама вычтет стыки (по 600 мм на угол).</span>
 
-        <div class="form-group">
+        <div class="form-group" style="margin-top: 15px;">
             <label>Количество пеналов (высоких шкафов), шт.</label>
             <input type="number" id="penceals-count" value="0" min="0" step="1">
-            <span class="helper-text">*Каждыи пенал занимает 0.6 м длины и вычитается из общеи длины кухни.</span>
+            <span class="helper-text">*Каждый пенал занимает 0.6 м длины и вычитается из общей длины кухни.</span>
         </div>
 
         <div class="form-group">
@@ -359,7 +361,7 @@
             <select id="countertop-type">
                 <option value="none">Без столешницы</option>
                 <option value="ldsp">ЛДСП</option>
-                <option value="stone">Искусственныи камень</option>
+                <option value="stone">Искусственный камень</option>
             </select>
         </div>
 
@@ -367,9 +369,9 @@
             <label>Материал фасадов кухни</label>
             <select id="material-main">
                 <option value="ldsp">ЛДСП (включено в базу)</option>
-                <option value="pvh">Пленка ПВХ (наценка)</option>
-                <option value="plastic">Пластик (наценка)</option>
-                <option value="painted">Крашеные (наценка)</option>
+                <option value="pvh">Пленка ПВХ</option>
+                <option value="plastic">Пластик</option>
+                <option value="painted">Крашеные фасады</option>
             </select>
         </div>
     </div>
@@ -377,27 +379,27 @@
     <!-- ================= ФОРМА ШКАФОВ ================= -->
     <div id="form-wardrobe" class="hidden">
         <div class="info-box">
-            <strong>Материал корпуса:</strong> ЛДСП Egger (премиум-класс)<br>
-            <strong>Петли:</strong> Blum с доводчиками<br>
+            <strong>Материал корпуса:</strong> ЛДСП Egger (Германия)<br>
+            <strong>Петли:</strong> Blum на открывание фасадов<br>
             <strong>Глубина:</strong> 600 мм<br>
-            <span class="height-warning">* Цена указана с расчетом шкафа при высоте до 2700 мм. Если выше — доплата (обсуждается с менеджером).</span>
+            <span class="height-warning">* Цена указана с расчетом шкафа при высоте до 2700 мм. Если выше — обсуждается с менеджером.</span>
         </div>
 
         <div class="form-group">
             <label>Форма шкафа</label>
             <select id="wardrobe-form-type" onchange="updateWardrobeInputs()">
-                <option value="straight">Прямои</option>
-                <option value="corner">Угловои</option>
+                <option value="straight">Прямой</option>
+                <option value="corner">Угловой</option>
             </select>
         </div>
 
         <div class="length-inputs">
             <div class="form-group">
-                <label>Длина основнои стены (в метрах)</label>
+                <label>Длина основной стены (в метрах)</label>
                 <input type="number" id="len-wardrobe-1" value="2" min="0" step="0.1">
             </div>
             <div class="form-group hidden" id="wardrobe-len-group-2">
-                <label>Длина второи стены (в метрах)</label>
+                <label>Длина второй стены (в метрах)</label>
                 <input type="number" id="len-wardrobe-2" value="1.5" min="0" step="0.1">
             </div>
         </div>
@@ -432,7 +434,6 @@
     const PENCEAL_WIDTH_METERS = 0.6; 
     const CORNER_OVERLAP = 0.6;       
 
-    // Секретная панель
     let clickCount = 0;
     let clickTimer;
     const logo = document.getElementById('secret-logo');
@@ -445,10 +446,10 @@
         } else if (clickCount === 3) {
             clearTimeout(clickTimer);
             clickCount = 0;
-            if (adminPanel.style.display === 'block') {
-                adminPanel.style.display = 'none';
-            } else {
+            if (adminPanel.style.display === 'none') {
                 adminPanel.style.display = 'block';
+            } else {
+                adminPanel.style.display = 'none';
             }
         }
     });
@@ -503,12 +504,10 @@
     function calculate() {
         let finalPrice = 0;
 
-        // Наценки для кухни
         const markupPvh = parseFloat(document.getElementById('markup-pvh').value) || 0;
         const markupPlastic = parseFloat(document.getElementById('markup-plastic').value) || 0;
         const markupPainted = parseFloat(document.getElementById('markup-painted').value) || 0;
 
-        // Наценки для пеналов
         const markupPvhPenceal = parseFloat(document.getElementById('markup-pvh-penceal').value) || 0;
         const markupPlasticPenceal = parseFloat(document.getElementById('markup-plastic-penceal').value) || 0;
         const markupPaintedPenceal = parseFloat(document.getElementById('markup-painted-penceal').value) || 0;
@@ -554,7 +553,6 @@
             const markupMain = getFacadeMarkup(materialMain);
             let costFacadeMain = standardLength * markupMain;
 
-            // Логика пеналов (база + наценка)
             const pencealMarkup = getPencealMarkup(materialMain);
             let costPenceals = pencealsCount * (pricePenceal + pencealMarkup);
 
@@ -574,7 +572,6 @@
             finalPrice = costStandard + costPenceals + costFacadeMain + costDrawers + costCountertop;
 
         } else {
-            // Логика для ШКАФОВ
             const priceWardrobeStraight = parseFloat(document.getElementById('price-wardrobe-straight').value) || 0;
             const priceWardrobeCorner = parseFloat(document.getElementById('price-wardrobe-corner').value) || 0;
             
