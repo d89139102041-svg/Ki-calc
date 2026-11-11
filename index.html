@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Кухонная История</title>
     
-    <!-- Подключаем НОВЫЕ библиотеки для картинки и PDF -->
+    <!-- Подключаем библиотеки для картинки и PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
@@ -240,17 +240,18 @@
         .length-inputs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
         .helper-text { font-size: 11px; color: #888; margin-top: 6px; display: block; line-height: 1.4; }
 
-        /* Бланк для PDF/JPEG (прячем за главным окном) */
+        /* КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Бланк полностью скрыт по умолчанию */
         #pdf-template {
-            position: absolute;
+            display: none; /* Скрываем полностью */
+            position: fixed;
             top: 0;
             left: 0;
-            z-index: -100; /* Прячем за белым фоном */
+            z-index: 9999; /* Поверх всего в момент генерации */
             font-family: Arial, sans-serif;
             padding: 40px;
             color: #333;
             background: #fff;
-            width: 750px; /* Ширина для рендера */
+            width: 750px; /* Фиксированная ширина для ровной картинки */
         }
         #pdf-template .pdf-header {
             text-align: center;
@@ -284,14 +285,16 @@
         #loading-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.9);
             display: none;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
+            z-index: 10000;
             font-size: 18px;
             font-weight: bold;
             color: var(--brand-red);
+            text-align: center;
+            padding: 20px;
         }
     </style>
 </head>
@@ -459,11 +462,11 @@
     <div class="action-buttons">
         <button class="btn-action btn-pdf" onclick="downloadPDF()">
             <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
-            Скачать PDF
+            PDF
         </button>
         <button class="btn-action btn-jpg" onclick="downloadJPEG()">
             <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/><path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/></svg>
-            Скачать JPEG
+            JPEG
         </button>
     </div>
 
@@ -475,7 +478,7 @@
 
 </div>
 
-<!-- Бланк для PDF/JPEG -->
+<!-- Бланк для PDF/JPEG (скрыт по умолчанию) -->
 <div id="pdf-template">
     <div class="pdf-header">
         <img src="логотип.jpeg" alt="Кухонная История" class="pdf-logo" crossorigin="anonymous">
@@ -497,7 +500,7 @@
 </div>
 
 <!-- Оверлей загрузки -->
-<div id="loading-overlay">Генерируем файл... Пожалуйста, подождите.</div>
+<div id="loading-overlay">Генерируем файл...<br>Пожалуйста, подождите.</div>
 
 <script>
     let currentProduct = 'kitchen';
@@ -594,7 +597,11 @@
         return details;
     }
 
+    // Вспомогательная функция заполнения бланка
     function fillTemplate() {
+        // Принудительно пересчитываем цену перед генерацией
+        calculate(); 
+        
         const details = getOrderDetails();
         const tableBody = document.getElementById('pdf-table-body');
         const totalPriceSpan = document.getElementById('pdf-total-price');
@@ -617,45 +624,50 @@
         totalPriceSpan.innerText = details.totalPrice;
     }
 
-    // Скачивание JPEG
+    // ФУНКЦИЯ СКАЧИВАНИЯ JPEG
     function downloadJPEG() {
         fillTemplate();
-        const overlay = document.getElementById('loading-overlay');
-        overlay.style.display = 'flex'; // Показываем загрузку
         
+        const overlay = document.getElementById('loading-overlay');
         const element = document.getElementById('pdf-template');
         
-        // Ждем 300мс для загрузки логотипа и делаем снимок
+        overlay.style.display = 'flex'; // Показываем загрузку
+        element.style.display = 'block'; // Показываем бланк (он перекрыт оверлеем)
+
+        // Ждем 300мс для загрузки картинок и рендера шрифтов
         setTimeout(() => {
             html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
-                // Создаем ссылку для скачивания
                 const link = document.createElement('a');
                 link.download = 'Расчет_Кухонная_История.jpg';
                 link.href = canvas.toDataURL('image/jpeg', 0.9);
                 link.click();
                 
-                overlay.style.display = 'none'; // Скрываем загрузку
+                // Прячем всё обратно
+                overlay.style.display = 'none';
+                element.style.display = 'none';
             }).catch(err => {
                 console.error(err);
                 alert('Ошибка при создании картинки');
                 overlay.style.display = 'none';
+                element.style.display = 'none';
             });
         }, 300);
     }
 
-    // Скачивание PDF
+    // ФУНКЦИЯ СКАЧИВАНИЯ PDF
     function downloadPDF() {
         fillTemplate();
-        const overlay = document.getElementById('loading-overlay');
-        overlay.style.display = 'flex'; 
         
+        const overlay = document.getElementById('loading-overlay');
         const element = document.getElementById('pdf-template');
         
+        overlay.style.display = 'flex';
+        element.style.display = 'block'; 
+
         setTimeout(() => {
             html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
                 const imgData = canvas.toDataURL('image/jpeg', 0.9);
                 
-                // Используем jsPDF
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 
@@ -665,11 +677,13 @@
                 pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
                 pdf.save('Расчет_Кухонная_История.pdf');
                 
-                overlay.style.display = 'none'; 
+                overlay.style.display = 'none';
+                element.style.display = 'none';
             }).catch(err => {
                 console.error(err);
                 alert('Ошибка при создании PDF');
                 overlay.style.display = 'none';
+                element.style.display = 'none';
             });
         }, 300);
     }
