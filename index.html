@@ -52,7 +52,6 @@
             width: 100%;
         }
 
-        /* Стили для переключателя Кухни/Шкафы */
         .product-toggle {
             display: flex;
             gap: 10px;
@@ -107,7 +106,6 @@
             border-color: var(--brand-red);
         }
         
-        /* Панель настройки цен */
         .admin-panel {
             border: 2px dashed var(--brand-red);
             padding: 15px;
@@ -164,7 +162,6 @@
             color: white;
         }
 
-        /* Блок с контактами менеджера */
         .manager-info {
             margin-top: 20px;
             text-align: center;
@@ -185,9 +182,15 @@
             text-decoration: underline;
         }
 
-        /* Скрытие блоков */
         .hidden {
             display: none !important;
+        }
+
+        /* Стили для динамических полей длины */
+        .length-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
     </style>
 </head>
@@ -200,29 +203,23 @@
         <div class="red-divider"></div>
     </div>
 
-    <!-- Переключатель категорий -->
     <div class="product-toggle">
         <button id="btn-kitchen" class="active" onclick="setProduct('kitchen')">Кухни</button>
         <button id="btn-wardrobe" onclick="setProduct('wardrobe')">Шкафы</button>
     </div>
 
-    <!-- ПАНЕЛЬ НАСТРОЙКИ ЦЕН (для тебя) -->
+    <!-- ПАНЕЛЬ НАСТРОЙКИ ЦЕН -->
     <div class="admin-panel">
         <h3>⚙️ Настройка базовых цен</h3>
         
-        <!-- Цены для Кухонь -->
-        <div class="admin-group-title">Кухни:</div>
+        <div class="admin-group-title">Кухни (база ЛДСП):</div>
         <div class="admin-grid">
             <div>
-                <label>1 м. Низа (₽)</label>
-                <input type="number" id="price-bottom" value="15000">
+                <label>1 м. Кухни (₽)</label>
+                <input type="number" id="price-kitchen-base" value="20000">
             </div>
             <div>
-                <label>1 м. Верха (₽)</label>
-                <input type="number" id="price-top" value="10000">
-            </div>
-            <div>
-                <label>1 Пенал (₽)</label>
+                <label>1 Пенал (фикс. ₽)</label>
                 <input type="number" id="price-penceal" value="25000">
             </div>
             <div>
@@ -243,7 +240,22 @@
             </div>
         </div>
 
-        <!-- Цены для Шкафов -->
+        <div class="admin-group-title">Наценки за фасады (руб. к метру):</div>
+        <div class="admin-grid">
+            <div>
+                <label>Пленка ПВХ (+₽/м)</label>
+                <input type="number" id="markup-pvh" value="3000">
+            </div>
+            <div>
+                <label>Пластик (+₽/м)</label>
+                <input type="number" id="markup-plastic" value="6000">
+            </div>
+            <div>
+                <label>Крашеные (+₽/м)</label>
+                <input type="number" id="markup-painted" value="8000">
+            </div>
+        </div>
+
         <div class="admin-group-title">Шкафы:</div>
         <div class="admin-grid">
             <div>
@@ -260,34 +272,43 @@
     <!-- ================= ФОРМА КУХНИ ================= -->
     <div id="form-kitchen">
         <div class="info-box">
-            <strong>Материал корпуса:</strong> ЛДСП Egger (премиум-класс)<br>
-            <strong>Петли:</strong> Blum с доводчиками
+            <strong>Базовая комплектация:</strong> Корпус ЛДСП Egger, фасады ЛДСП, петли Blum.<br>
+            <em>Выберите форму кухни, чтобы указать размеры.</em>
         </div>
 
         <div class="form-group">
             <label>Форма кухни</label>
-            <select id="kitchen-form-type">
-                <option value="Прямая">Прямая</option>
-                <option value="Угловая">Угловая</option>
-                <option value="П-образная">П-образная</option>
+            <select id="kitchen-form-type" onchange="updateLengthInputs()">
+                <option value="straight">Прямая</option>
+                <option value="corner">Угловая (Г-образная)</option>
+                <option value="u-shape">П-образная</option>
             </select>
         </div>
 
-        <div class="form-group">
-            <label>Длина нижних шкафов (в метрах)</label>
-            <input type="number" id="len-bottom" value="3" min="0" step="0.1">
+        <!-- Динамические поля длины -->
+        <div class="length-inputs" id="length-inputs-container">
+            <div class="form-group">
+                <label>Длина кухни (в метрах)</label>
+                <input type="number" id="len-main-1" value="3" min="0" step="0.1">
+            </div>
+            <div class="form-group hidden" id="len-group-2">
+                <label>Длина второй стены (в метрах)</label>
+                <input type="number" id="len-main-2" value="2" min="0" step="0.1">
+            </div>
+            <div class="form-group hidden" id="len-group-3">
+                <label>Длина третьей стены (в метрах)</label>
+                <input type="number" id="len-main-3" value="2" min="0" step="0.1">
+            </div>
         </div>
 
-        <div class="form-group">
-            <label>Длина верхних шкафов (в метрах)</label>
-            <input type="number" id="len-top" value="2" min="0" step="0.1">
-        </div>
-
+        <!-- Пеналы -->
         <div class="form-group">
             <label>Количество пеналов (высоких шкафов), шт.</label>
-            <input type="number" id="penceals" value="0" min="0" step="1">
+            <input type="number" id="penceals-count" value="0" min="0" step="1">
+            <small style="color: #777; font-size: 11px;">*1 пенал (шириной 60см) автоматически вычитается из общей длины кухни.</small>
         </div>
 
+        <!-- Выдвижные ящики -->
         <div class="form-group">
             <label>Количество выдвижных ящиков, шт.</label>
             <input type="number" id="drawers-count" value="0" min="0" step="1">
@@ -311,12 +332,23 @@
         </div>
 
         <div class="form-group">
-            <label>Материал фасадов</label>
-            <select id="material">
-                <option value="ldsp">ЛДСП (базовая)</option>
-                <option value="pvh">Пленка ПВХ</option>
-                <option value="plastic">Пластик</option>
-                <option value="painted">Крашеные фасады</option>
+            <label>Материал основных фасадов</label>
+            <select id="material-main">
+                <option value="ldsp">ЛДСП (включено в базу)</option>
+                <option value="pvh">Пленка ПВХ (наценка)</option>
+                <option value="plastic">Пластик (наценка)</option>
+                <option value="painted">Крашеные (наценка)</option>
+            </select>
+        </div>
+
+        <!-- Фасад для пеналов (если они есть) -->
+        <div class="form-group" id="penceal-material-group" style="display: none;">
+            <label>Материал фасадов пеналов</label>
+            <select id="material-penceal">
+                <option value="ldsp">ЛДСП (включено в базу)</option>
+                <option value="pvh">Пленка ПВХ (наценка)</option>
+                <option value="plastic">Пластик (наценка)</option>
+                <option value="painted">Крашеные (наценка)</option>
             </select>
         </div>
     </div>
@@ -367,18 +399,14 @@
 </div>
 
 <script>
-    // Текущий выбранный продукт ('kitchen' или 'wardrobe')
     let currentProduct = 'kitchen';
+    const PENCEAL_WIDTH_METERS = 0.6; // Стандартная ширина пенала для вычета из длины
 
-    // Функция переключения вкладок
     function setProduct(type) {
         currentProduct = type;
-        
-        // Меняем активный класс у кнопок
         document.getElementById('btn-kitchen').classList.remove('active');
         document.getElementById('btn-wardrobe').classList.remove('active');
         
-        // Показываем нужную форму и скрываем другую
         if (type === 'kitchen') {
             document.getElementById('btn-kitchen').classList.add('active');
             document.getElementById('form-kitchen').classList.remove('hidden');
@@ -388,107 +416,141 @@
             document.getElementById('form-kitchen').classList.add('hidden');
             document.getElementById('form-wardrobe').classList.remove('hidden');
         }
-        
-        // Пересчитываем цену при переключении
         calculate();
     }
 
-    // Элементы формы (Кухни)
-    const lenBottomInput = document.getElementById('len-bottom');
-    const lenTopInput = document.getElementById('len-top');
-    const pencealsInput = document.getElementById('penceals');
-    const drawersCountInput = document.getElementById('drawers-count');
-    const drawerTypeSelect = document.getElementById('drawer-type');
-    const countertopTypeSelect = document.getElementById('countertop-type');
-    
-    // Элементы формы (Шкафы)
-    const wardrobeFormTypeSelect = document.getElementById('wardrobe-form-type');
-    const lenWardrobeInput = document.getElementById('len-wardrobe');
+    // Логика показа полей длины в зависимости от формы кухни
+    function updateLengthInputs() {
+        const formType = document.getElementById('kitchen-form-type').value;
+        const group2 = document.getElementById('len-group-2');
+        const group3 = document.getElementById('len-group-3');
 
-    const totalPriceEl = document.getElementById('total-price');
-    
-    // Элементы цен (Кухни)
-    const priceBottomInput = document.getElementById('price-bottom');
-    const priceTopInput = document.getElementById('price-top');
-    const pricePencealInput = document.getElementById('price-penceal');
-    const priceDrawerBlumInput = document.getElementById('price-drawer-blum');
-    const priceDrawerAnalogInput = document.getElementById('price-drawer-analog');
-    const priceCountertopLdspInput = document.getElementById('price-countertop-ldsp');
-    const priceCountertopStoneInput = document.getElementById('price-countertop-stone');
+        if (formType === 'straight') {
+            group2.classList.add('hidden');
+            group3.classList.add('hidden');
+        } else if (formType === 'corner') {
+            group2.classList.remove('hidden');
+            group3.classList.add('hidden');
+        } else if (formType === 'u-shape') {
+            group2.classList.remove('hidden');
+            group3.classList.remove('hidden');
+        }
+        calculate();
+    }
 
-    // Элементы цен (Шкафы)
-    const priceWardrobeStraightInput = document.getElementById('price-wardrobe-straight');
-    const priceWardrobeCornerInput = document.getElementById('price-wardrobe-corner');
+    // Показ выбора фасада для пеналов, если они выбраны
+    function togglePencealMaterial() {
+        const count = parseInt(document.getElementById('penceals-count').value) || 0;
+        const pencealMatGroup = document.getElementById('penceal-material-group');
+        if (count > 0) {
+            pencealMatGroup.style.display = 'block';
+        } else {
+            pencealMatGroup.style.display = 'none';
+        }
+    }
 
     function calculate() {
         let finalPrice = 0;
 
+        // Общие данные для расчета фасадов
+        const markupPvh = parseFloat(document.getElementById('markup-pvh').value) || 0;
+        const markupPlastic = parseFloat(document.getElementById('markup-plastic').value) || 0;
+        const markupPainted = parseFloat(document.getElementById('markup-painted').value) || 0;
+
+        function getFacadeMarkup(material) {
+            if (material === 'pvh') return markupPvh;
+            if (material === 'plastic') return markupPlastic;
+            if (material === 'painted') return markupPainted;
+            return 0;
+        }
+
         if (currentProduct === 'kitchen') {
-            // Цены из панели (Кухни)
-            let priceBottom = parseFloat(priceBottomInput.value) || 0;
-            let priceTop = parseFloat(priceTopInput.value) || 0;
-            let pricePenceal = parseFloat(pricePencealInput.value) || 0;
-            let priceBlum = parseFloat(priceDrawerBlumInput.value) || 0;
-            let priceAnalog = parseFloat(priceDrawerAnalogInput.value) || 0;
-            let priceCountertopLdsp = parseFloat(priceCountertopLdspInput.value) || 0;
-            let priceCountertopStone = parseFloat(priceCountertopStoneInput.value) || 0;
-
-            // Данные из формы (Кухни)
-            let lenBottom = parseFloat(lenBottomInput.value) || 0;
-            let lenTop = parseFloat(lenTopInput.value) || 0;
-            let penceals = parseInt(pencealsInput.value) || 0;
-            let drawersCount = parseInt(drawersCountInput.value) || 0;
-            let drawerType = drawerTypeSelect.value;
-            let countertopType = countertopTypeSelect.value;
-
-            // Считаем позиции
-            let costBottom = lenBottom * priceBottom;
-            let costTop = lenTop * priceTop;
-            let costPenceal = penceals * pricePenceal;
+            // 1. Считаем общую длину кухни
+            const formType = document.getElementById('kitchen-form-type').value;
+            let totalLength = parseFloat(document.getElementById('len-main-1').value) || 0;
             
-            // Считаем ящики
-            let costDrawers = 0;
-            if (drawerType === 'blum') {
-                costDrawers = drawersCount * priceBlum;
-            } else {
-                costDrawers = drawersCount * priceAnalog;
+            if (formType !== 'straight') {
+                totalLength += parseFloat(document.getElementById('len-main-2').value) || 0;
+            }
+            if (formType === 'u-shape') {
+                totalLength += parseFloat(document.getElementById('len-main-3').value) || 0;
             }
 
-            // Считаем столешницу
+            // 2. Вычитаем пеналы
+            const pencealsCount = parseInt(document.getElementById('penceals-count').value) || 0;
+            const pencealDeduction = pencealsCount * PENCEAL_WIDTH_METERS;
+            let standardLength = Math.max(0, totalLength - pencealDeduction); // Защита от отрицательных чисел
+
+            // 3. Считаем базовые цены
+            const priceBase = parseFloat(document.getElementById('price-kitchen-base').value) || 0;
+            const pricePenceal = parseFloat(document.getElementById('price-penceal').value) || 0;
+            
+            let costStandard = standardLength * priceBase;
+            let costPenceals = pencealsCount * pricePenceal;
+
+            // 4. Применяем наценки на фасады (только на длину обычных шкафов)
+            const materialMain = document.getElementById('material-main').value;
+            const markupMain = getFacadeMarkup(materialMain);
+            let costFacadeMain = standardLength * markupMain;
+
+            // 5. Применяем наценки на фасады пеналов (на каждый пенал шириной 0.6м)
+            const materialPenceal = document.getElementById('material-penceal').value;
+            const markupPenceal = getFacadeMarkup(materialPenceal);
+            let costFacadePenceal = (pencealsCount * PENCEAL_WIDTH_METERS) * markupPenceal;
+
+            // 6. Ящики
+            const drawersCount = parseInt(document.getElementById('drawers-count').value) || 0;
+            const drawerType = document.getElementById('drawer-type').value;
+            const priceBlum = parseFloat(document.getElementById('price-drawer-blum').value) || 0;
+            const priceAnalog = parseFloat(document.getElementById('price-drawer-analog').value) || 0;
+            let costDrawers = drawersCount * (drawerType === 'blum' ? priceBlum : priceAnalog);
+
+            // 7. Столешница (считаем только на длину обычных шкафов)
+            const countertopType = document.getElementById('countertop-type').value;
+            const priceCtLdsp = parseFloat(document.getElementById('price-countertop-ldsp').value) || 0;
+            const priceCtStone = parseFloat(document.getElementById('price-countertop-stone').value) || 0;
             let costCountertop = 0;
-            if (countertopType === 'ldsp') {
-                costCountertop = lenBottom * priceCountertopLdsp;
-            } else if (countertopType === 'stone') {
-                costCountertop = lenBottom * priceCountertopStone;
-            }
+            if (countertopType === 'ldsp') costCountertop = standardLength * priceCtLdsp;
+            if (countertopType === 'stone') costCountertop = standardLength * priceCtStone;
 
-            finalPrice = costBottom + costTop + costPenceal + costDrawers + costCountertop;
-            
+            // ИТОГО ДЛЯ КУХНИ
+            finalPrice = costStandard + costPenceals + costFacadeMain + costFacadePenceal + costDrawers + costCountertop;
+
         } else {
             // Логика для ШКАФОВ
-            let priceWardrobeStraight = parseFloat(priceWardrobeStraightInput.value) || 0;
-            let priceWardrobeCorner = parseFloat(priceWardrobeCornerInput.value) || 0;
+            const priceWardrobeStraight = parseFloat(document.getElementById('price-wardrobe-straight').value) || 0;
+            const priceWardrobeCorner = parseFloat(document.getElementById('price-wardrobe-corner').value) || 0;
             
-            let lenWardrobe = parseFloat(lenWardrobeInput.value) || 0;
-            let wardrobeType = wardrobeFormTypeSelect.value;
+            const lenWardrobe = parseFloat(document.getElementById('len-wardrobe').value) || 0;
+            const wardrobeType = document.getElementById('wardrobe-form-type').value;
+            const material = document.getElementById('wardrobe-material').value;
             
             let pricePerMeter = (wardrobeType === 'straight') ? priceWardrobeStraight : priceWardrobeCorner;
+            // Для шкафов пока применяем наценку просто к метру (если понадобится - уточним логику)
+            let markup = getFacadeMarkup(material);
             
-            finalPrice = lenWardrobe * pricePerMeter;
+            finalPrice = lenWardrobe * (pricePerMeter + markup);
         }
 
         // Выводим итог
-        totalPriceEl.innerText = new Intl.NumberFormat('ru-RU').format(Math.round(finalPrice)) + ' ₽';
+        document.getElementById('total-price').innerText = new Intl.NumberFormat('ru-RU').format(Math.round(finalPrice)) + ' ₽';
     }
 
-    // Слушаем изменения во всех инпутах
+    // Слушаем изменения
     const allInputs = document.querySelectorAll('input[type="number"], select');
     allInputs.forEach(input => {
-        input.addEventListener('input', calculate);
-        input.addEventListener('change', calculate);
+        input.addEventListener('input', () => {
+            if (input.id === 'penceals-count') togglePencealMaterial();
+            calculate();
+        });
+        input.addEventListener('change', () => {
+            if (input.id === 'penceals-count') togglePencealMaterial();
+            calculate();
+        });
     });
 
-    // Первый расчет
+    // Инициализация
+    updateLengthInputs();
     calculate();
 </script>
 
