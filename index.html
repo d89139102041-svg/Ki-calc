@@ -35,7 +35,7 @@
             border-top: 5px solid var(--brand-red);
             border-bottom: 5px solid var(--brand-red);
             position: relative;
-            z-index: 10; /* Калькулятор поверх бланка PDF */
+            z-index: 10;
         }
         
         .header-section {
@@ -238,19 +238,17 @@
         .length-inputs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
         .helper-text { font-size: 11px; color: #888; margin-top: 6px; display: block; line-height: 1.4; }
 
-        /* ХИТРОСТЬ: Прячем бланк PDF, но оставляем его на экране для библиотеки */
+        /* Бланк для PDF - изначально скрыт за экраном */
         #pdf-template {
             position: absolute;
-            left: 0;
+            left: -9999px;
             top: 0;
-            z-index: -1000; /* Уводим на задний план */
-            opacity: 0.01; /* Делаем почти невидимым, но библиотека его видит */
-            pointer-events: none; /* Отключаем клики */
+            z-index: -1;
             font-family: Arial, sans-serif;
             padding: 40px;
             color: #333;
             background: #fff;
-            width: 750px; /* Фиксированная ширина для PDF */
+            width: 750px;
         }
         #pdf-template .pdf-header {
             text-align: center;
@@ -461,10 +459,10 @@
 
 </div>
 
-<!-- Бланк для PDF (невидим для глаз, но виден для библиотеки) -->
+<!-- Бланк для PDF (изначально скрыт) -->
 <div id="pdf-template">
     <div class="pdf-header">
-        <img src="логотип.jpeg" alt="Кухонная История" class="pdf-logo">
+        <img src="логотип.jpeg" alt="Кухонная История" class="pdf-logo" crossorigin="anonymous">
         <h2>Расчет стоимости</h2>
     </div>
     <table class="pdf-table">
@@ -578,18 +576,17 @@
         return details;
     }
 
-    // ФУНКЦИЯ СКАЧИВАНИЯ PDF
+    // УЛУЧШЕННАЯ ФУНКЦИЯ СКАЧИВАНИЯ PDF
     function downloadPDF() {
         const details = getOrderDetails();
         const tableBody = document.getElementById('pdf-table-body');
         const totalPriceSpan = document.getElementById('pdf-total-price');
         
+        // 1. Заполняем данные
         tableBody.innerHTML = '';
-        
         let rows = '';
         for (const [key, value] of Object.entries(details)) {
             if (key === 'totalPrice' || key === 'type') continue;
-            
             let label = '';
             if (key === 'form') label = 'Форма';
             if (key === 'length') label = 'Длина';
@@ -597,32 +594,37 @@
             if (key === 'drawers') label = 'Ящики';
             if (key === 'countertop') label = 'Столешница';
             if (key === 'material') label = 'Фасады';
-            
             rows += `<tr><th>${label}</th><td>${value}</td></tr>`;
         }
-        
         rows = `<tr><th>Изделие</th><td style="font-weight:bold; color:#b71c1c;">${details.type}</td></tr>` + rows;
         tableBody.innerHTML = rows;
         totalPriceSpan.innerText = details.totalPrice;
 
         const element = document.getElementById('pdf-template');
         
-        // Настройки PDF
+        // 2. ВРЕМЕННО ПОКАЗЫВАЕМ БЛАНК НА ЭКРАНЕ (за другими элементами), чтобы библиотека его увидела
+        element.style.left = '0';
+        element.style.top = '0';
+        element.style.zIndex = '-10'; // Прячем за фон, но он рендерится
+
         const opt = {
             margin:       10,
             filename:     'Расчет_Кухонная_История.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, logging: false },
+            // useCORS: true очень важно для загрузки картинок
+            html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0 },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        // Добавляем задержку в 300мс, чтобы браузер успел отрисовать логотип и таблицу
+        // 3. Ждем 500мс, чтобы картинка 100% загрузилась, генерируем PDF и прячем обратно
         setTimeout(() => {
-            html2pdf().set(opt).from(element).save();
-        }, 300);
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Возвращаем бланк за экран
+                element.style.left = '-9999px';
+            });
+        }, 500);
     }
 
-    // ФУНКЦИЯ ОТПРАВКИ В WHATSAPP
     function sendToWhatsApp() {
         const details = getOrderDetails();
         
@@ -642,7 +644,7 @@
         message += `Пришлите, пожалуйста, точный расчет.`;
 
         const encodedMessage = encodeURIComponent(message);
-        const phone = '79231334233'; // Номер Ивана
+        const phone = '79231334233'; 
         
         window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
     }
