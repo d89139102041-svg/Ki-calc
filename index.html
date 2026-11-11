@@ -166,6 +166,29 @@
             color: white;
         }
 
+        /* Контейнер для чертежа */
+        .scheme-result {
+            margin-top: 20px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            background: #fafafa;
+            text-align: center;
+        }
+        .scheme-result h4 {
+            margin: 0 0 10px 0;
+            font-size: 12px;
+            color: #777;
+            text-transform: uppercase;
+        }
+        
+        /* Стили для SVG чертежа */
+        #dynamic-scheme {
+            width: 100%;
+            height: auto;
+            max-height: 150px;
+        }
+
         .manager-info {
             margin-top: 20px;
             text-align: center;
@@ -316,7 +339,6 @@
             <select id="kitchen-form-type" onchange="updateLengthInputs()">
                 <option value="straight">Прямая</option>
                 <option value="corner">Г-образная</option>
-                <option value="u-shape">П-образная</option>
             </select>
         </div>
 
@@ -328,10 +350,6 @@
             <div class="form-group hidden" id="len-group-2">
                 <label>Длина второй стены (в метрах)</label>
                 <input type="number" id="len-main-2" value="2" min="0" step="0.1">
-            </div>
-            <div class="form-group hidden" id="len-group-3">
-                <label>Длина третьей стены (в метрах)</label>
-                <input type="number" id="len-main-3" value="2" min="0" step="0.1">
             </div>
         </div>
         
@@ -421,6 +439,14 @@
         <div class="total-price" id="total-price">0 ₽</div>
     </div>
 
+    <!-- Динамический чертеж -->
+    <div class="scheme-result" id="scheme-result-container">
+        <h4>Ваша конфигурация (вид сверху)</h4>
+        <svg id="dynamic-scheme" viewBox="0 0 400 120" preserveAspectRatio="xMidYMid meet">
+            <!-- Здесь будет генерироваться чертеж -->
+        </svg>
+    </div>
+
     <!-- Контакты менеджера -->
     <div class="manager-info">
         Ваш менеджер: <strong>Иван</strong><br>
@@ -463,10 +489,12 @@
             document.getElementById('btn-kitchen').classList.add('active');
             document.getElementById('form-kitchen').classList.remove('hidden');
             document.getElementById('form-wardrobe').classList.add('hidden');
+            document.getElementById('scheme-result-container').style.display = 'block';
         } else {
             document.getElementById('btn-wardrobe').classList.add('active');
             document.getElementById('form-kitchen').classList.add('hidden');
             document.getElementById('form-wardrobe').classList.remove('hidden');
+            document.getElementById('scheme-result-container').style.display = 'none'; // Скрываем схему для шкафов
         }
         calculate();
     }
@@ -474,17 +502,11 @@
     function updateLengthInputs() {
         const formType = document.getElementById('kitchen-form-type').value;
         const group2 = document.getElementById('len-group-2');
-        const group3 = document.getElementById('len-group-3');
 
         if (formType === 'straight') {
             group2.classList.add('hidden');
-            group3.classList.add('hidden');
         } else if (formType === 'corner') {
             group2.classList.remove('hidden');
-            group3.classList.add('hidden');
-        } else if (formType === 'u-shape') {
-            group2.classList.remove('hidden');
-            group3.classList.remove('hidden');
         }
         calculate();
     }
@@ -499,6 +521,126 @@
             group2.classList.add('hidden');
         }
         calculate();
+    }
+
+    // ФУНКЦИЯ ОТРИСОВКИ ЧЕРТЕЖА
+    function drawScheme(len1, len2, penceals, formType) {
+        const svg = document.getElementById('dynamic-scheme');
+        svg.innerHTML = ''; // Очищаем предыдущий чертеж
+
+        // Ограничители, чтобы чертеж не вылезал за края
+        const maxWidth = 360;
+        const maxHeight = 100;
+        const startX = 20;
+        const startY = 20;
+
+        // Масштаб: сколько пикселей на 1 метр. 
+        // Берем общую ширину (длину 1 + толщину 2 стены) и высоту.
+        let totalWidthMeters = len1 + (formType === 'corner' ? 0.6 : 0);
+        let totalHeightMeters = formType === 'corner' ? len2 : 0.6;
+
+        // Защита от нулевой длины
+        if(totalWidthMeters <= 0) totalWidthMeters = 1;
+        if(totalHeightMeters <= 0) totalHeightMeters = 0.6;
+
+        // Вычисляем масштаб, чтобы всё влезло
+        let scaleX = maxWidth / totalWidthMeters;
+        let scaleY = maxHeight / totalHeightMeters;
+        let scale = Math.min(scaleX, scaleY);
+
+        // Отрисовка в зависимости от формы
+        if (formType === 'straight') {
+            // Рисуем обычные шкафы (низ)
+            const rectNormal = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            rectNormal.setAttribute("x", startX);
+            rectNormal.setAttribute("y", startY + 30);
+            rectNormal.setAttribute("width", len1 * scale);
+            rectNormal.setAttribute("height", 40); // Условная глубина
+            rectNormal.setAttribute("fill", "#e0e0e0");
+            rectNormal.setAttribute("stroke", "#333");
+            rectNormal.setAttribute("stroke-width", "2");
+            svg.appendChild(rectNormal);
+
+            // Текст длины
+            const textLen = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            textLen.setAttribute("x", startX + (len1 * scale) / 2);
+            textLen.setAttribute("y", startY + 20);
+            textLen.setAttribute("text-anchor", "middle");
+            textLen.setAttribute("font-size", "12");
+            textLen.setAttribute("fill", "#b71c1c");
+            textLen.textContent = len1 + " м";
+            svg.appendChild(textLen);
+
+        } else if (formType === 'corner') {
+            // Основная стена (горизонтальная)
+            const rectMain = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            rectMain.setAttribute("x", startX);
+            rectMain.setAttribute("y", startY + 40);
+            rectMain.setAttribute("width", len1 * scale);
+            rectMain.setAttribute("height", 40);
+            rectMain.setAttribute("fill", "#e0e0e0");
+            rectMain.setAttribute("stroke", "#333");
+            rectMain.setAttribute("stroke-width", "2");
+            svg.appendChild(rectMain);
+
+            // Вторая стена (вертикальная)
+            const rectSecond = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            rectSecond.setAttribute("x", startX);
+            rectSecond.setAttribute("y", startY + 40 - (len2 * scale));
+            rectSecond.setAttribute("width", 40); // Условная глубина
+            rectSecond.setAttribute("height", len2 * scale);
+            rectSecond.setAttribute("fill", "#e0e0e0");
+            rectSecond.setAttribute("stroke", "#333");
+            rectSecond.setAttribute("stroke-width", "2");
+            svg.appendChild(rectSecond);
+
+            // Подписи
+            const text1 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text1.setAttribute("x", startX + (len1 * scale) / 2);
+            text1.setAttribute("y", startY + 30);
+            text1.setAttribute("text-anchor", "middle");
+            text1.setAttribute("font-size", "12");
+            text1.setAttribute("fill", "#b71c1c");
+            text1.textContent = len1 + " м";
+            svg.appendChild(text1);
+
+            const text2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text2.setAttribute("x", startX - 10);
+            text2.setAttribute("y", startY + 40 - (len2 * scale) / 2);
+            text2.setAttribute("text-anchor", "end");
+            text2.setAttribute("font-size", "12");
+            text2.setAttribute("fill", "#b71c1c");
+            text2.textContent = len2 + " м";
+            svg.appendChild(text2);
+        }
+
+        // Отрисовка пеналов (если есть)
+        if (penceals > 0) {
+            const pencealWidth = penceals * PENCEAL_WIDTH_METERS * scale;
+            const rectPenceals = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            
+            // Пеналы ставим в конец основной стены
+            let penX = startX;
+            if (formType === 'straight') penX += (len1 * scale);
+            if (formType === 'corner') penX += (len1 * scale);
+
+            rectPenceals.setAttribute("x", penX);
+            rectPenceals.setAttribute("y", startY + 10); // Пеналы выше обычных шкафов
+            rectPenceals.setAttribute("width", pencealWidth);
+            rectPenceals.setAttribute("height", 70); // Высота пенала
+            rectPenceals.setAttribute("fill", "#333"); // Темный цвет для выделения
+            svg.appendChild(rectPenceals);
+
+            // Подпись пеналов
+            const textPen = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            textPen.setAttribute("x", penX + pencealWidth / 2);
+            textPen.setAttribute("y", startY + 5);
+            textPen.setAttribute("text-anchor", "middle");
+            textPen.setAttribute("font-size", "10");
+            textPen.setAttribute("fill", "#333");
+            textPen.textContent = "Пенал";
+            svg.appendChild(textPen);
+        }
     }
 
     function calculate() {
@@ -528,15 +670,13 @@
 
         if (currentProduct === 'kitchen') {
             const formType = document.getElementById('kitchen-form-type').value;
-            let rawTotalLength = parseFloat(document.getElementById('len-main-1').value) || 0;
+            let len1 = parseFloat(document.getElementById('len-main-1').value) || 0;
+            let len2 = parseFloat(document.getElementById('len-main-2').value) || 0;
+            let rawTotalLength = len1;
             
             if (formType === 'corner') {
-                rawTotalLength += parseFloat(document.getElementById('len-main-2').value) || 0;
+                rawTotalLength += len2;
                 rawTotalLength -= CORNER_OVERLAP; 
-            } else if (formType === 'u-shape') {
-                rawTotalLength += parseFloat(document.getElementById('len-main-2').value) || 0;
-                rawTotalLength += parseFloat(document.getElementById('len-main-3').value) || 0;
-                rawTotalLength -= (CORNER_OVERLAP * 2); 
             }
             
             rawTotalLength = Math.max(0, rawTotalLength);
@@ -571,7 +711,11 @@
 
             finalPrice = costStandard + costPenceals + costFacadeMain + costDrawers + costCountertop;
 
+            // РИСУЕМ ЧЕРТЕЖ
+            drawScheme(len1, len2, pencealsCount, formType);
+
         } else {
+            // ... логика шкафов ...
             const priceWardrobeStraight = parseFloat(document.getElementById('price-wardrobe-straight').value) || 0;
             const priceWardrobeCorner = parseFloat(document.getElementById('price-wardrobe-corner').value) || 0;
             
