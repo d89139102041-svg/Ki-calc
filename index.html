@@ -11,7 +11,7 @@
             --bg-color: #f4f4f4;
         }
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             color: var(--brand-dark);
             display: flex;
@@ -24,9 +24,9 @@
             background: white;
             padding: 30px;
             border-radius: 12px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             width: 100%;
-            max-width: 500px;
+            max-width: 550px;
             border-top: 5px solid var(--brand-red);
             border-bottom: 5px solid var(--brand-red);
         }
@@ -43,8 +43,6 @@
             margin: 0 auto;
             width: 100%;
             cursor: pointer;
-            user-select: none;
-            -webkit-user-select: none;
         }
 
         .red-divider {
@@ -78,31 +76,34 @@
         }
 
         .info-box {
-            background-color: #f9f9f9;
+            background-color: #fafafa;
             border-left: 4px solid var(--brand-dark);
             padding: 10px 15px;
             font-size: 13px;
             margin-bottom: 20px;
             color: #555;
             line-height: 1.5;
+            border-radius: 0 6px 6px 0;
         }
         .form-group {
             margin-bottom: 15px;
         }
         label {
             display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-weight: 600;
+            margin-bottom: 6px;
             font-size: 14px;
+            color: #444;
         }
         input[type="number"], select {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ccc;
+            border: 1px solid #ddd;
             border-radius: 6px;
-            font-size: 16px;
+            font-size: 15px;
             box-sizing: border-box;
             transition: border-color 0.3s;
+            background-color: #fff;
         }
         input[type="number"]:focus, select:focus {
             outline: none;
@@ -130,8 +131,8 @@
             font-size: 12px;
             color: #666;
             margin: 15px 0 5px 0;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 3px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
         }
         .admin-grid {
             display: grid;
@@ -140,53 +141,59 @@
         }
         .admin-grid label {
             font-size: 11px;
+            margin-bottom: 2px;
         }
         .admin-grid input {
             padding: 6px;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .total-box {
             margin-top: 25px;
-            padding: 20px;
+            padding: 25px;
             background-color: var(--brand-dark);
             color: white;
             border-radius: 8px;
             text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         .total-box span {
             display: block;
             font-size: 14px;
-            color: #ccc;
+            color: #aaa;
             margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .total-price {
-            font-size: 32px;
-            font-weight: bold;
+            font-size: 36px;
+            font-weight: 800;
             color: white;
         }
 
-        /* Контейнер для чертежа */
+        /* Стили для красивого чертежа */
         .scheme-result {
-            margin-top: 20px;
-            border: 2px solid #eee;
-            border-radius: 8px;
-            padding: 15px;
-            background: #fafafa;
-            text-align: center;
+            margin-top: 25px;
+            border: 1px solid #eaeaea;
+            border-radius: 10px;
+            padding: 20px;
+            background: #fdfdfd;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
         }
         .scheme-result h4 {
-            margin: 0 0 10px 0;
+            margin: 0 0 15px 0;
             font-size: 12px;
-            color: #777;
+            color: #888;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
         }
         
-        /* Стили для SVG чертежа */
         #dynamic-scheme {
             width: 100%;
             height: auto;
-            max-height: 150px;
+            max-height: 200px;
+            display: block;
         }
 
         .manager-info {
@@ -209,10 +216,8 @@
             text-decoration: underline;
         }
 
-        .hidden {
-            display: none !important;
-        }
-
+        .hidden { display: none !important; }
+        
         .length-inputs {
             display: flex;
             flex-direction: column;
@@ -222,8 +227,8 @@
         
         .helper-text {
             font-size: 11px;
-            color: #777;
-            margin-top: 5px;
+            color: #888;
+            margin-top: 6px;
             display: block;
             line-height: 1.4;
         }
@@ -251,6 +256,7 @@
         <button id="btn-wardrobe" onclick="setProduct('wardrobe')">Шкафы</button>
     </div>
 
+    <!-- ПАНЕЛЬ НАСТРОЙКИ ЦЕН -->
     <div class="admin-panel" id="admin-panel">
         <h3>⚙️ Настройка базовых цен</h3>
         
@@ -442,8 +448,8 @@
     <!-- Динамический чертеж -->
     <div class="scheme-result" id="scheme-result-container">
         <h4>Ваша конфигурация (вид сверху)</h4>
-        <svg id="dynamic-scheme" viewBox="0 0 400 120" preserveAspectRatio="xMidYMid meet">
-            <!-- Здесь будет генерироваться чертеж -->
+        <svg id="dynamic-scheme" viewBox="0 0 500 160" preserveAspectRatio="xMidYMid meet">
+            <!-- Генерируется в JS -->
         </svg>
     </div>
 
@@ -460,6 +466,7 @@
     const PENCEAL_WIDTH_METERS = 0.6; 
     const CORNER_OVERLAP = 0.6;       
 
+    // Секретная панель
     let clickCount = 0;
     let clickTimer;
     const logo = document.getElementById('secret-logo');
@@ -472,11 +479,7 @@
         } else if (clickCount === 3) {
             clearTimeout(clickTimer);
             clickCount = 0;
-            if (adminPanel.style.display === 'none') {
-                adminPanel.style.display = 'block';
-            } else {
-                adminPanel.style.display = 'none';
-            }
+            adminPanel.style.display = adminPanel.style.display === 'none' ? 'block' : 'none';
         }
     });
 
@@ -494,154 +497,187 @@
             document.getElementById('btn-wardrobe').classList.add('active');
             document.getElementById('form-kitchen').classList.add('hidden');
             document.getElementById('form-wardrobe').classList.remove('hidden');
-            document.getElementById('scheme-result-container').style.display = 'none'; // Скрываем схему для шкафов
+            document.getElementById('scheme-result-container').style.display = 'none';
         }
         calculate();
     }
 
     function updateLengthInputs() {
         const formType = document.getElementById('kitchen-form-type').value;
-        const group2 = document.getElementById('len-group-2');
-
         if (formType === 'straight') {
-            group2.classList.add('hidden');
-        } else if (formType === 'corner') {
-            group2.classList.remove('hidden');
+            document.getElementById('len-group-2').classList.add('hidden');
+        } else {
+            document.getElementById('len-group-2').classList.remove('hidden');
         }
         calculate();
     }
 
     function updateWardrobeInputs() {
         const formType = document.getElementById('wardrobe-form-type').value;
-        const group2 = document.getElementById('wardrobe-len-group-2');
-        
         if (formType === 'corner') {
-            group2.classList.remove('hidden');
+            document.getElementById('wardrobe-len-group-2').classList.remove('hidden');
         } else {
-            group2.classList.add('hidden');
+            document.getElementById('wardrobe-len-group-2').classList.add('hidden');
         }
         calculate();
     }
 
-    // ФУНКЦИЯ ОТРИСОВКИ ЧЕРТЕЖА
-    function drawScheme(len1, len2, penceals, formType) {
+    // ================= КРАСИВАЯ ОТРИСОВКА ЧЕРТЕЖА =================
+    function drawBeautifulScheme(len1, len2, pencealsCount, formType) {
         const svg = document.getElementById('dynamic-scheme');
-        svg.innerHTML = ''; // Очищаем предыдущий чертеж
+        svg.innerHTML = ''; 
 
-        // Ограничители, чтобы чертеж не вылезал за края
-        const maxWidth = 360;
-        const maxHeight = 100;
-        const startX = 20;
-        const startY = 20;
+        const startX = 80;
+        const startY = 40;
+        const cabinetDepth = 50; // Условная глубина в пикселях
+        const penWidthPx = pencealsCount * PENCEAL_WIDTH_METERS;
+        
+        // Общая длина для расчета масштаба
+        let totalMeters = len1 + (formType === 'corner' ? len2 - 0.6 : 0) + penWidthPx;
+        if (totalMeters <= 0) return;
 
-        // Масштаб: сколько пикселей на 1 метр. 
-        // Берем общую ширину (длину 1 + толщину 2 стены) и высоту.
-        let totalWidthMeters = len1 + (formType === 'corner' ? 0.6 : 0);
-        let totalHeightMeters = formType === 'corner' ? len2 : 0.6;
+        const maxDrawWidth = 350; 
+        let scale = maxDrawWidth / totalMeters;
 
-        // Защита от нулевой длины
-        if(totalWidthMeters <= 0) totalWidthMeters = 1;
-        if(totalHeightMeters <= 0) totalHeightMeters = 0.6;
+        // Вспомогательная функция для создания элементов
+        function createEl(type, attrs) {
+            const el = document.createElementNS("http://www.w3.org/2000/svg", type);
+            for (let k in attrs) el.setAttribute(k, attrs[k]);
+            return el;
+        }
 
-        // Вычисляем масштаб, чтобы всё влезло
-        let scaleX = maxWidth / totalWidthMeters;
-        let scaleY = maxHeight / totalHeightMeters;
-        let scale = Math.min(scaleX, scaleY);
+        // Цвета
+        const colorCabinet = "#e0e0e0";
+        const colorPen = "#b71c1c";
+        const colorTop = "#ffffff";
+        const colorStroke = "#333333";
+        const colorText = "#333333";
 
-        // Отрисовка в зависимости от формы
+        let currentX = startX;
+
         if (formType === 'straight') {
-            // Рисуем обычные шкафы (низ)
-            const rectNormal = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            rectNormal.setAttribute("x", startX);
-            rectNormal.setAttribute("y", startY + 30);
-            rectNormal.setAttribute("width", len1 * scale);
-            rectNormal.setAttribute("height", 40); // Условная глубина
-            rectNormal.setAttribute("fill", "#e0e0e0");
-            rectNormal.setAttribute("stroke", "#333");
-            rectNormal.setAttribute("stroke-width", "2");
-            svg.appendChild(rectNormal);
+            // --- Рисуем ПРЯМУЮ кухню ---
+            const normalLenPx = (len1 - penWidthPx) * scale;
+            const penLenPx = penWidthPx * scale;
 
-            // Текст длины
-            const textLen = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            textLen.setAttribute("x", startX + (len1 * scale) / 2);
-            textLen.setAttribute("y", startY + 20);
-            textLen.setAttribute("text-anchor", "middle");
-            textLen.setAttribute("font-size", "12");
-            textLen.setAttribute("fill", "#b71c1c");
-            textLen.textContent = len1 + " м";
-            svg.appendChild(textLen);
+            // 1. Обычные шкафы (серые)
+            if (normalLenPx > 0) {
+                svg.appendChild(createEl('rect', {
+                    x: currentX, y: startY, width: normalLenPx, height: cabinetDepth,
+                    fill: colorCabinet, stroke: colorStroke, 'stroke-width': '1.5'
+                }));
+                // Столешница (белая полоса сверху)
+                svg.appendChild(createEl('rect', {
+                    x: currentX, y: startY - 4, width: normalLenPx, height: 8,
+                    fill: colorTop, stroke: colorStroke, 'stroke-width': '1'
+                }));
+                currentX += normalLenPx;
+            }
+
+            // 2. Пеналы (красные)
+            if (penLenPx > 0) {
+                svg.appendChild(createEl('rect', {
+                    x: currentX, y: startY - 5, width: penLenPx, height: cabinetDepth + 10, // Пеналы выше
+                    fill: colorPen, stroke: colorStroke, 'stroke-width': '1.5'
+                }));
+            }
+
+            // 3. Размерная линия снизу
+            const dimY = startY + cabinetDepth + 25;
+            svg.appendChild(createEl('line', {
+                x1: startX, y1: dimY, x2: startX + len1 * scale, y2: dimY,
+                stroke: colorText, 'stroke-width': '1'
+            }));
+            // Засечки
+            svg.appendChild(createEl('line', { x1: startX, y1: dimY-4, x2: startX, y2: dimY+4, stroke: colorText }));
+            svg.appendChild(createEl('line', { x1: startX + len1 * scale, y1: dimY-4, x2: startX + len1 * scale, y2: dimY+4, stroke: colorText }));
+            
+            // Текст размера
+            const txt = createEl('text', {
+                x: startX + (len1 * scale) / 2, y: dimY + 15,
+                'text-anchor': 'middle', 'font-size': '13', 'font-family': 'Arial', 'font-weight': 'bold', fill: colorText
+            });
+            txt.textContent = len1 + " м";
+            svg.appendChild(txt);
 
         } else if (formType === 'corner') {
+            // --- Рисуем Г-ОБРАЗНУЮ кухню ---
             // Основная стена (горизонтальная)
-            const rectMain = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            rectMain.setAttribute("x", startX);
-            rectMain.setAttribute("y", startY + 40);
-            rectMain.setAttribute("width", len1 * scale);
-            rectMain.setAttribute("height", 40);
-            rectMain.setAttribute("fill", "#e0e0e0");
-            rectMain.setAttribute("stroke", "#333");
-            rectMain.setAttribute("stroke-width", "2");
-            svg.appendChild(rectMain);
+            const wall1Normal = (len1 - penWidthPx) * scale;
+            const penLenPx = penWidthPx * scale;
+            const wall2Px = (len2 - 0.6) * scale; // Вычитаем стык
 
-            // Вторая стена (вертикальная)
-            const rectSecond = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            rectSecond.setAttribute("x", startX);
-            rectSecond.setAttribute("y", startY + 40 - (len2 * scale));
-            rectSecond.setAttribute("width", 40); // Условная глубина
-            rectSecond.setAttribute("height", len2 * scale);
-            rectSecond.setAttribute("fill", "#e0e0e0");
-            rectSecond.setAttribute("stroke", "#333");
-            rectSecond.setAttribute("stroke-width", "2");
-            svg.appendChild(rectSecond);
+            // 1. Основная стена (низ)
+            if (wall1Normal > 0) {
+                svg.appendChild(createEl('rect', {
+                    x: currentX, y: startY, width: wall1Normal, height: cabinetDepth,
+                    fill: colorCabinet, stroke: colorStroke, 'stroke-width': '1.5'
+                }));
+                // Столешница
+                svg.appendChild(createEl('rect', {
+                    x: currentX, y: startY - 4, width: wall1Normal, height: 8,
+                    fill: colorTop, stroke: colorStroke, 'stroke-width': '1'
+                }));
+                currentX += wall1Normal;
+            }
 
-            // Подписи
-            const text1 = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            text1.setAttribute("x", startX + (len1 * scale) / 2);
-            text1.setAttribute("y", startY + 30);
-            text1.setAttribute("text-anchor", "middle");
-            text1.setAttribute("font-size", "12");
-            text1.setAttribute("fill", "#b71c1c");
-            text1.textContent = len1 + " м";
-            svg.appendChild(text1);
+            // 2. Пеналы в конце основной стены
+            if (penLenPx > 0) {
+                svg.appendChild(createEl('rect', {
+                    x: currentX, y: startY - 5, width: penLenPx, height: cabinetDepth + 10,
+                    fill: colorPen, stroke: colorStroke, 'stroke-width': '1.5'
+                }));
+            }
 
-            const text2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            text2.setAttribute("x", startX - 10);
-            text2.setAttribute("y", startY + 40 - (len2 * scale) / 2);
-            text2.setAttribute("text-anchor", "end");
-            text2.setAttribute("font-size", "12");
-            text2.setAttribute("fill", "#b71c1c");
-            text2.textContent = len2 + " м";
-            svg.appendChild(text2);
-        }
+            // 3. Вторая стена (вертикальная)
+            const wall2X = startX;
+            const wall2Y = startY - wall2Px;
+            svg.appendChild(createEl('rect', {
+                x: wall2X, y: wall2Y, width: cabinetDepth, height: wall2Px,
+                fill: colorCabinet, stroke: colorStroke, 'stroke-width': '1.5'
+            }));
+            // Столешница второй стены
+            svg.appendChild(createEl('rect', {
+                x: wall2X - 4, y: wall2Y, width: 8, height: wall2Px,
+                fill: colorTop, stroke: colorStroke, 'stroke-width': '1'
+            }));
 
-        // Отрисовка пеналов (если есть)
-        if (penceals > 0) {
-            const pencealWidth = penceals * PENCEAL_WIDTH_METERS * scale;
-            const rectPenceals = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            // 4. Размерные линии
+            const dimY = startY + cabinetDepth + 25;
+            // Линия для основной стены
+            svg.appendChild(createEl('line', { x1: startX, y1: dimY, x2: startX + len1 * scale, y2: dimY, stroke: colorText, 'stroke-width': '1' }));
+            svg.appendChild(createEl('line', { x1: startX, y1: dimY-4, x2: startX, y2: dimY+4, stroke: colorText }));
+            svg.appendChild(createEl('line', { x1: startX + len1 * scale, y1: dimY-4, x2: startX + len1 * scale, y2: dimY+4, stroke: colorText }));
             
-            // Пеналы ставим в конец основной стены
-            let penX = startX;
-            if (formType === 'straight') penX += (len1 * scale);
-            if (formType === 'corner') penX += (len1 * scale);
+            const txt1 = createEl('text', {
+                x: startX + (len1 * scale) / 2, y: dimY + 15,
+                'text-anchor': 'middle', 'font-size': '13', 'font-family': 'Arial', 'font-weight': 'bold', fill: colorText
+            });
+            txt1.textContent = len1 + " м";
+            svg.appendChild(txt1);
 
-            rectPenceals.setAttribute("x", penX);
-            rectPenceals.setAttribute("y", startY + 10); // Пеналы выше обычных шкафов
-            rectPenceals.setAttribute("width", pencealWidth);
-            rectPenceals.setAttribute("height", 70); // Высота пенала
-            rectPenceals.setAttribute("fill", "#333"); // Темный цвет для выделения
-            svg.appendChild(rectPenceals);
+            // Линия для второй стены (слева)
+            const dimX2 = startX - 25;
+            svg.appendChild(createEl('line', { x1: dimX2, y1: startY - wall2Px, x2: dimX2, y2: startY, stroke: colorText, 'stroke-width': '1' }));
+            svg.appendChild(createEl('line', { x1: dimX2-4, y1: startY - wall2Px, x2: dimX2+4, y2: startY - wall2Px, stroke: colorText }));
+            svg.appendChild(createEl('line', { x1: dimX2-4, y1: startY, x2: dimX2+4, y2: startY, stroke: colorText }));
 
-            // Подпись пеналов
-            const textPen = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            textPen.setAttribute("x", penX + pencealWidth / 2);
-            textPen.setAttribute("y", startY + 5);
-            textPen.setAttribute("text-anchor", "middle");
-            textPen.setAttribute("font-size", "10");
-            textPen.setAttribute("fill", "#333");
-            textPen.textContent = "Пенал";
-            svg.appendChild(textPen);
+            const txt2 = createEl('text', {
+                x: dimX2 - 10, y: startY - wall2Px / 2,
+                'text-anchor': 'middle', 'font-size': '13', 'font-family': 'Arial', 'font-weight': 'bold', fill: colorText,
+                transform: `rotate(-90, ${dimX2 - 10}, ${startY - wall2Px / 2})`
+            });
+            txt2.textContent = len2 + " м";
+            svg.appendChild(txt2);
+
+            // Подпись угла/стыка
+            svg.appendChild(createEl('rect', {
+                x: startX, y: startY, width: cabinetDepth, height: cabinetDepth,
+                fill: colorCabinet, stroke: colorStroke, 'stroke-width': '1.5'
+            })); // Угловой модуль
         }
     }
+    // =========================================================
 
     function calculate() {
         let finalPrice = 0;
@@ -712,10 +748,10 @@
             finalPrice = costStandard + costPenceals + costFacadeMain + costDrawers + costCountertop;
 
             // РИСУЕМ ЧЕРТЕЖ
-            drawScheme(len1, len2, pencealsCount, formType);
+            drawBeautifulScheme(len1, len2, pencealsCount, formType);
 
         } else {
-            // ... логика шкафов ...
+            // ... логика шкафов без изменений ...
             const priceWardrobeStraight = parseFloat(document.getElementById('price-wardrobe-straight').value) || 0;
             const priceWardrobeCorner = parseFloat(document.getElementById('price-wardrobe-corner').value) || 0;
             
