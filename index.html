@@ -37,7 +37,6 @@
             margin-bottom: 20px;
         }
         
-        /* Добавил курсор поинтер и запрет на выделение текста при клике */
         .logo {
             display: inline-block;
             max-width: 300px;
@@ -110,7 +109,7 @@
             border-color: var(--brand-red);
         }
         
-        /* Скрываем панель по умолчанию */
+        /* Скрытая панель */
         .admin-panel {
             display: none; 
             border: 2px dashed var(--brand-red);
@@ -228,9 +227,9 @@
         <button id="btn-wardrobe" onclick="setProduct('wardrobe')">Шкафы</button>
     </div>
 
-    <!-- ПАНЕЛЬ НАСТРОЙКИ ЦЕН (Скрыта, открывается тройным кликом на лого) -->
+    <!-- ПАНЕЛЬ НАСТРОИКИ ЦЕН (Скрыта, открывается троиным кликом на лого) -->
     <div class="admin-panel" id="admin-panel">
-        <h3>⚙️ Настройка базовых цен</h3>
+        <h3>⚙️ Настроика базовых цен</h3>
         
         <div class="admin-group-title">Кухни (база ЛДСП):</div>
         <div class="admin-grid">
@@ -260,7 +259,7 @@
             </div>
         </div>
 
-        <div class="admin-group-title">Наценки за фасады (руб. к метру):</div>
+        <div class="admin-group-title">Наценки за фасады кухни (руб. к метру):</div>
         <div class="admin-grid">
             <div>
                 <label>Пленка ПВХ (+₽/м)</label>
@@ -273,6 +272,22 @@
             <div>
                 <label>Крашеные (+₽/м)</label>
                 <input type="number" id="markup-painted" value="8000">
+            </div>
+        </div>
+
+        <div class="admin-group-title">Наценки за фасады пеналов (руб. к шт.):</div>
+        <div class="admin-grid">
+            <div>
+                <label>Пленка ПВХ (+₽)</label>
+                <input type="number" id="markup-pvh-penceal" value="2000">
+            </div>
+            <div>
+                <label>Пластик (+₽)</label>
+                <input type="number" id="markup-plastic-penceal" value="4000">
+            </div>
+            <div>
+                <label>Крашеные (+₽)</label>
+                <input type="number" id="markup-painted-penceal" value="6000">
             </div>
         </div>
 
@@ -293,7 +308,7 @@
     <div id="form-kitchen">
         <div class="info-box">
             <strong>Базовая комплектация:</strong> Корпус ЛДСП Egger, фасады ЛДСП, петли Blum.<br>
-            <em>Указывайте размеры стен от угла до угла — программа сама вычтет стыки (по 600 мм на угол).</em>
+            <em>Указываите размеры стен от угла до угла — программа сама вычтет стыки (по 600 мм на угол).</em>
         </div>
 
         <div class="form-group">
@@ -305,30 +320,27 @@
             </select>
         </div>
 
-        <!-- Динамические поля длины (Кухни) -->
         <div class="length-inputs" id="length-inputs-container">
             <div class="form-group">
-                <label>Длина основной стены (в метрах)</label>
+                <label>Длина основнои стены (в метрах)</label>
                 <input type="number" id="len-main-1" value="3" min="0" step="0.1">
             </div>
             <div class="form-group hidden" id="len-group-2">
-                <label>Длина второй стены (в метрах)</label>
+                <label>Длина второи стены (в метрах)</label>
                 <input type="number" id="len-main-2" value="2" min="0" step="0.1">
             </div>
             <div class="form-group hidden" id="len-group-3">
-                <label>Длина третьей стены (в метрах)</label>
+                <label>Длина третьеи стены (в метрах)</label>
                 <input type="number" id="len-main-3" value="2" min="0" step="0.1">
             </div>
         </div>
 
-        <!-- Пеналы -->
         <div class="form-group">
             <label>Количество пеналов (высоких шкафов), шт.</label>
             <input type="number" id="penceals-count" value="0" min="0" step="1">
-            <span class="helper-text">*Каждый пенал занимает 0.6 м длины и вычитается из общей длины кухни.</span>
+            <span class="helper-text">*Каждыи пенал занимает 0.6 м длины и вычитается из общеи длины кухни.</span>
         </div>
 
-        <!-- Выдвижные ящики -->
         <div class="form-group">
             <label>Количество выдвижных ящиков, шт.</label>
             <input type="number" id="drawers-count" value="0" min="0" step="1">
@@ -347,7 +359,7 @@
             <select id="countertop-type">
                 <option value="none">Без столешницы</option>
                 <option value="ldsp">ЛДСП</option>
-                <option value="stone">Искусственный камень</option>
+                <option value="stone">Искусственныи камень</option>
             </select>
         </div>
 
@@ -374,19 +386,18 @@
         <div class="form-group">
             <label>Форма шкафа</label>
             <select id="wardrobe-form-type" onchange="updateWardrobeInputs()">
-                <option value="straight">Прямой</option>
-                <option value="corner">Угловой</option>
+                <option value="straight">Прямои</option>
+                <option value="corner">Угловои</option>
             </select>
         </div>
 
-        <!-- Динамические поля длины (Шкафы) -->
         <div class="length-inputs">
             <div class="form-group">
-                <label>Длина основной стены (в метрах)</label>
+                <label>Длина основнои стены (в метрах)</label>
                 <input type="number" id="len-wardrobe-1" value="2" min="0" step="0.1">
             </div>
             <div class="form-group hidden" id="wardrobe-len-group-2">
-                <label>Длина второй стены (в метрах)</label>
+                <label>Длина второи стены (в метрах)</label>
                 <input type="number" id="len-wardrobe-2" value="1.5" min="0" step="0.1">
             </div>
         </div>
@@ -421,7 +432,7 @@
     const PENCEAL_WIDTH_METERS = 0.6; 
     const CORNER_OVERLAP = 0.6;       
 
-    // --- СЕКРЕТНАЯ ПАНЕЛЬ (ТРОЙНОЙ КЛИК) ---
+    // Секретная панель
     let clickCount = 0;
     let clickTimer;
     const logo = document.getElementById('secret-logo');
@@ -430,12 +441,10 @@
     logo.addEventListener('click', function() {
         clickCount++;
         if (clickCount === 1) {
-            // Сбрасываем счетчик через 600 мс, если не было следующих кликов
             clickTimer = setTimeout(() => { clickCount = 0; }, 600);
         } else if (clickCount === 3) {
             clearTimeout(clickTimer);
             clickCount = 0;
-            // Переключаем видимость
             if (adminPanel.style.display === 'block') {
                 adminPanel.style.display = 'none';
             } else {
@@ -443,7 +452,6 @@
             }
         }
     });
-    // --------------------------------------
 
     function setProduct(type) {
         currentProduct = type;
@@ -495,14 +503,27 @@
     function calculate() {
         let finalPrice = 0;
 
+        // Наценки для кухни
         const markupPvh = parseFloat(document.getElementById('markup-pvh').value) || 0;
         const markupPlastic = parseFloat(document.getElementById('markup-plastic').value) || 0;
         const markupPainted = parseFloat(document.getElementById('markup-painted').value) || 0;
+
+        // Наценки для пеналов
+        const markupPvhPenceal = parseFloat(document.getElementById('markup-pvh-penceal').value) || 0;
+        const markupPlasticPenceal = parseFloat(document.getElementById('markup-plastic-penceal').value) || 0;
+        const markupPaintedPenceal = parseFloat(document.getElementById('markup-painted-penceal').value) || 0;
 
         function getFacadeMarkup(material) {
             if (material === 'pvh') return markupPvh;
             if (material === 'plastic') return markupPlastic;
             if (material === 'painted') return markupPainted;
+            return 0;
+        }
+
+        function getPencealMarkup(material) {
+            if (material === 'pvh') return markupPvhPenceal;
+            if (material === 'plastic') return markupPlasticPenceal;
+            if (material === 'painted') return markupPaintedPenceal;
             return 0;
         }
 
@@ -528,11 +549,14 @@
             const pricePenceal = parseFloat(document.getElementById('price-penceal').value) || 0;
             
             let costStandard = standardLength * priceBase;
-            let costPenceals = pencealsCount * pricePenceal;
 
             const materialMain = document.getElementById('material-main').value;
             const markupMain = getFacadeMarkup(materialMain);
             let costFacadeMain = standardLength * markupMain;
+
+            // Логика пеналов (база + наценка)
+            const pencealMarkup = getPencealMarkup(materialMain);
+            let costPenceals = pencealsCount * (pricePenceal + pencealMarkup);
 
             const drawersCount = parseInt(document.getElementById('drawers-count').value) || 0;
             const drawerType = document.getElementById('drawer-type').value;
@@ -550,6 +574,7 @@
             finalPrice = costStandard + costPenceals + costFacadeMain + costDrawers + costCountertop;
 
         } else {
+            // Логика для ШКАФОВ
             const priceWardrobeStraight = parseFloat(document.getElementById('price-wardrobe-straight').value) || 0;
             const priceWardrobeCorner = parseFloat(document.getElementById('price-wardrobe-corner').value) || 0;
             
@@ -568,7 +593,6 @@
             }
             
             let markup = getFacadeMarkup(material);
-            
             finalPrice = totalLen * (pricePerMeter + markup);
         }
 
