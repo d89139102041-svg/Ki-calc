@@ -22,6 +22,7 @@
             justify-content: center;
             padding: 20px;
             margin: 0;
+            overflow-x: hidden; /* Защита от горизонтального скролла из-за скрытого PDF */
         }
         
         .calculator-container {
@@ -210,11 +211,12 @@
         }
         .btn-pdf:hover { background-color: #e0e0e0; }
         
-        .btn-tg {
-            background-color: #0088cc;
+        /* Изменили цвет на зеленый для WhatsApp */
+        .btn-wa {
+            background-color: #25D366; 
             color: white;
         }
-        .btn-tg:hover { background-color: #006699; }
+        .btn-wa:hover { background-color: #128C7E; }
 
         .manager-info {
             margin-top: 20px;
@@ -238,7 +240,11 @@
         .helper-text { font-size: 11px; color: #888; margin-top: 6px; display: block; line-height: 1.4; }
 
         /* Стили для скрытого бланка PDF */
+        /* ВАЖНО: Мы убрали display:none, теперь бланк просто спрятан за левым краем экрана */
         #pdf-template {
+            position: absolute;
+            left: -9999px;
+            top: 0;
             font-family: Arial, sans-serif;
             padding: 40px;
             color: #333;
@@ -251,8 +257,8 @@
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
-        #pdf-template .pdf-logo { max-width: 200px; }
-        #pdf-template h2 { color: #b71c1c; margin-top: 0; }
+        #pdf-template .pdf-logo { max-width: 250px; }
+        #pdf-template h2 { color: #b71c1c; margin-top: 10px; }
         #pdf-template .pdf-table {
             width: 100%;
             border-collapse: collapse;
@@ -262,12 +268,14 @@
             border-bottom: 1px solid #eee;
             padding: 12px;
             text-align: left;
+            font-size: 16px;
         }
         #pdf-template .pdf-table th { width: 60%; color: #777; }
         #pdf-template .pdf-total {
             text-align: right;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
+            color: #b71c1c;
             margin-top: 20px;
         }
     </style>
@@ -438,9 +446,10 @@
             <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
             Скачать PDF
         </button>
-        <button class="btn-action btn-tg" onclick="sendToTelegram()">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.287 5.906c-.778.324-2.334.994-4.666 2.01-.378.15-.577.298-.595.442-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294.26.006.549-.1.868-.32 2.179-1.471 3.304-2.214 3.374-2.23.05-.012.12-.026.166.016.047.041.042.12.037.141-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8.154 8.154 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629.093.06.183.125.27.187.331.23.629.435.987.382.21-.03.425-.223.535-.83.274-1.515.828-4.795.883-5.154.005-.035.002-.176-.05-.23-.052-.054-.14-.077-.21-.066z"/></svg>
-            В Telegram
+        <button class="btn-action btn-wa" onclick="sendToWhatsApp()">
+            <!-- Иконка WhatsApp -->
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.1-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg>
+            В WhatsApp
         </button>
     </div>
 
@@ -452,10 +461,10 @@
 
 </div>
 
-<!-- Скрытый шаблон для PDF -->
-<div id="pdf-template" class="hidden">
+<!-- Скрытый шаблон для PDF (теперь он за краем экрана, а не display:none) -->
+<div id="pdf-template">
     <div class="pdf-header">
-        <img src="логотип.jpeg" alt="Логотип" class="pdf-logo">
+        <img src="логотип.jpeg" alt="Кухонная История" class="pdf-logo">
         <h2>Расчет стоимости</h2>
     </div>
     <table class="pdf-table">
@@ -474,12 +483,6 @@
 </div>
 
 <script>
-    // --- НАСТРОЙКИ TELEGRAM ---
-    // Вставь сюда токен бота и свой ID (инструкция в чате)
-    const TG_BOT_TOKEN = 'ВСТАВЬ_СЮДА_ТОКЕН_БОТА';
-    const TG_CHAT_ID = 'ВСТАВЬ_СЮДА_СВОЙ_ID';
-    // ---------------------------
-
     let currentProduct = 'kitchen';
     const PENCEAL_WIDTH_METERS = 0.6; 
     const CORNER_OVERLAP = 0.6;       
@@ -576,6 +579,7 @@
         return details;
     }
 
+    // Скачивание PDF
     function downloadPDF() {
         const details = getOrderDetails();
         const tableBody = document.getElementById('pdf-table-body');
@@ -583,7 +587,6 @@
         
         tableBody.innerHTML = '';
         
-        // Заполняем таблицу данными
         let rows = '';
         for (const [key, value] of Object.entries(details)) {
             if (key === 'totalPrice' || key === 'type') continue;
@@ -599,79 +602,58 @@
             rows += `<tr><th>${label}</th><td>${value}</td></tr>`;
         }
         
-        // Добавляем заголовок с типом изделия
         rows = `<tr><th>Изделие</th><td style="font-weight:bold; color:#b71c1c;">${details.type}</td></tr>` + rows;
-        
         tableBody.innerHTML = rows;
         totalPriceSpan.innerText = details.totalPrice;
 
-        // Генерируем PDF
         const element = document.getElementById('pdf-template');
+        
+        // Настройки PDF
         const opt = {
             margin:       1,
             filename:     'Расчет_Кухонная_История.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
+            // useCORS: true - ВАЖНО для загрузки картинок!
+            html2canvas:  { scale: 2, useCORS: true, logging: false },
             jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
         html2pdf().set(opt).from(element).save();
     }
 
-    function sendToTelegram() {
-        // Проверка, что токен вставлен
-        if (TG_BOT_TOKEN === 'ВСТАВЬ_СЮДА_ТОКЕН_БОТА') {
-            alert('Внимание! В код не вставлен Токен Telegram-бота. Инструкция в чате.');
-            return;
-        }
-
+    // Отправка в WhatsApp
+    function sendToWhatsApp() {
         const details = getOrderDetails();
         
-        // Формируем красивое сообщение
-        let message = `🔥 <b>Новый расчет с сайта!</b>\n\n`;
-        message += `<b>Изделие:</b> ${details.type}\n`;
-        message += `<b>Форма:</b> ${details.form}\n`;
-        message += `<b>Длина:</b> ${details.length}\n`;
+        // Формируем текст сообщения
+        let message = `Здравствуйте! Сделал расчет на сайте.\n\n`;
+        message += `Изделие: ${details.type}\n`;
+        message += `Форма: ${details.form}\n`;
+        message += `Длина: ${details.length}\n`;
         
         if (details.type === 'Кухня') {
-            message += `<b>Пеналы:</b> ${details.penceals}\n`;
-            message += `<b>Ящики:</b> ${details.drawers}\n`;
-            message += `<b>Столешница:</b> ${details.countertop}\n`;
+            message += `Пеналы: ${details.penceals}\n`;
+            message += `Ящики: ${details.drawers}\n`;
+            message += `Столешница: ${details.countertop}\n`;
         }
         
-        message += `<b>Фасады:</b> ${details.material}\n\n`;
-        message += `<b>💰 Итого: ${details.totalPrice}</b>\n\n`;
-        message += `📞 <i>Клиенту нужен звонок менеджера Ивана!</i>`;
+        message += `Фасады: ${details.material}\n\n`;
+        message += `Итого: ${details.totalPrice}\n\n`;
+        message += `Пришлите, пожалуйста, точный расчет.`;
 
-        // Отправка через Telegram API
-        const url = `https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`;
+        // Кодируем текст для ссылки
+        const encodedMessage = encodeURIComponent(message);
         
-        fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: TG_CHAT_ID,
-                text: message,
-                parse_mode: 'HTML'
-            })
-        })
-        .then(response => {
-            if (response.ok) {
-                alert('Заявка успешно отправлена! Менеджер Иван свяжется с вами.');
-            } else {
-                alert('Ошибка при отправке. Пожалуйста, позвоните нам напрямую.');
-            }
-        })
-        .catch(error => {
-            console.error('Ошибка:', error);
-            alert('Ошибка сети. Пожалуйста, позвоните нам напрямую.');
-        });
+        // Номер телефона Ивана (8-923-133-4233) переводим в международный формат (79231334233)
+        const phone = '79231334233';
+        
+        // Открываем WhatsApp (сработает и на телефоне, и на ПК)
+        window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
     }
 
     function calculate() {
         let finalPrice = 0;
         
-        // ... (предыдущий код расчета цен) ...
         const markupPvh = parseFloat(document.getElementById('markup-pvh').value) || 0;
         const markupPlastic = parseFloat(document.getElementById('markup-plastic').value) || 0;
         const markupPainted = parseFloat(document.getElementById('markup-painted').value) || 0;
